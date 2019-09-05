@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Json", "Json\Json.csproj", "{F564C666-6355-4813-B0B2-2AA48D77F5C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scratch", "scratch\scratch.csproj", "{694E728F-C5E5-4F86-8CFE-D6AEA2BF5449}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tmdb", "TmdbApi\Tmdb.csproj", "{4CB18977-DAA6-4BC4-B62A-A419265944CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{F564C666-6355-4813-B0B2-2AA48D77F5C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F564C666-6355-4813-B0B2-2AA48D77F5C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F564C666-6355-4813-B0B2-2AA48D77F5C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{694E728F-C5E5-4F86-8CFE-D6AEA2BF5449}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{694E728F-C5E5-4F86-8CFE-D6AEA2BF5449}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{694E728F-C5E5-4F86-8CFE-D6AEA2BF5449}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{694E728F-C5E5-4F86-8CFE-D6AEA2BF5449}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB18977-DAA6-4BC4-B62A-A419265944CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB18977-DAA6-4BC4-B62A-A419265944CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB18977-DAA6-4BC4-B62A-A419265944CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB18977-DAA6-4BC4-B62A-A419265944CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

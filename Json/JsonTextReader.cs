@@ -1,0 +1,458 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
+using System.Text;
+
+namespace Json
+{
+	using JsonField = KeyValuePair<string, object>;
+	
+	public enum JsonNodeType
+	{
+		EndDocument = -2,
+		Initial = -1,
+		Value = 0,
+		Key = 1,
+		Array = 2,
+		EndArray = 3,
+		Object = 4,
+		EndObject = 5
+	}
+	/// <summary>
+	/// A small streaming JSON pull-parser. Will work on large streams and non-seekable streams.
+	/// </summary>
+	/// <remarks>Works like Microsoft's <see cref="System.Xml.XmlReader"/></remarks>
+	public sealed class JsonTextReader : IDisposable
+	{
+		int _state;
+		ParseContext _pc;
+		internal JsonTextReader(ParseContext parseContext)
+		{
+			_pc = parseContext;
+			_state = -1;
+		}
+		public JsonNodeType NodeType => (JsonNodeType)_state;
+		public bool Read()
+		{
+			switch(_state)
+			{
+				case -2: // end of document
+					return false;
+				case -1: // initial
+					_pc.EnsureStarted();
+					_state = 0;
+					goto case 0;
+				case 0: // value
+					_pc.ClearCapture();
+					switch (_pc.Current)
+					{
+						case -1:
+							// end of input
+							_state = -2; // EndDocument
+							return false;
+						case ']':
+							_pc.Advance();
+							_pc.TrySkipWhiteSpace();
+							_pc.ClearCapture();
+							_state = 3; // end array
+							return true;
+						case '}':
+							_pc.Advance();
+							_pc.TrySkipWhiteSpace();
+							_pc.ClearCapture();
+							_state = 5; // end object
+							return true;
+						case ',':
+							_pc.Advance();
+							_pc.TrySkipWhiteSpace();
+							if (!Read()) // read the next value
+								_pc.Expecting();
+							return true;
+						case '[':
+							_pc.Advance();
+							_pc.TrySkipWhiteSpace();
+							_state = 2; // begin array
+							return true;
+						case '{':
+							_pc.Advance();
+							_pc.TrySkipWhiteSpace();
+							_state = 4; // begin object
+							return true;
+
+						case '-':
+						case '.':
+						case '0':
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7':
+						case '8':
+						case '9':
+							int qc = _pc.Current;
+							_pc.CaptureCurrent();
+							while (-1 != _pc.Advance() && ('E' == _pc.Current || 'e' == _pc.Current || '+' == _pc.Current || '.' == _pc.Current || char.IsDigit((char)_pc.Current)))
+								_pc.CaptureCurrent();
+							_pc.TrySkipWhiteSpace();
+							return true;
+						case '\"':
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.TryReadUntil('\"', '\\', true);
+							_pc.TrySkipWhiteSpace();
+							if (':' == _pc.Current)
+							{
+								_pc.Advance();
+								_pc.TrySkipWhiteSpace();
+								_pc.Expecting();
+								_state = 1; // key
+							}
+							return true;
+						case 't':
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('r');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('u');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('e');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.TrySkipWhiteSpace();
+							_pc.Expecting(',',']', '}', -1);
+							return true;
+						case 'f':
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('a');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('l');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('s');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('e');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.TrySkipWhiteSpace();
+							_pc.Expecting(',',']', '}', -1);
+							return true;
+						case 'n':
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('u');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('l');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.Expecting('l');
+							_pc.CaptureCurrent();
+							_pc.Advance();
+							_pc.TrySkipWhiteSpace();
+							_pc.Expecting(',',']', '}', -1);
+							return true;
+						default:
+							_pc.Expecting('-','.','0','1','2','3','4','5','6','7','8','9','\"','[',']','{','}','t','f','n');
+							return false;
+					}
+				default:
+					_state = 0;
+					goto case 0;
+			}
+		}
+		public void Close()
+		{
+			_pc.Close();
+			GC.SuppressFinalize(this);
+		}
+		void IDisposable.Dispose() => Close();
+		~JsonTextReader()
+		{
+			_pc.Close();
+		}
+		public static JsonTextReader Create(string jsonText)
+		{
+			return new JsonTextReader(ParseContext.Create(jsonText));
+		}
+		public static JsonTextReader CreateFrom(TextReader reader)
+		{
+			return new JsonTextReader(ParseContext.CreateFrom(reader));
+		}
+		public static JsonTextReader CreateFrom(string filename)
+		{
+			return new JsonTextReader(ParseContext.CreateFrom(filename));
+		}
+		public static JsonTextReader CreateFromUrl(string url)
+		{
+			return new JsonTextReader(ParseContext.CreateFromUrl(url));
+		}
+		public string RawValue {
+			get {
+				return _pc.GetCapture();
+			}
+		}
+		public object Value {
+			get {
+				var s = _pc.GetCapture();
+				if (0 == s.Length)
+					return null;
+				switch(s[0])
+				{
+					case '\"':
+						return JsonObject.UndecorateString(s);
+					case 't':
+						return true; // already checked during parse
+					case 'f':
+						return false; // already checked during parse
+					case 'n':
+						return null; // already checked during parse
+					default: // digit
+						int ni;
+						long nl;
+						System.Numerics.BigInteger nb;
+						if (int.TryParse(s, out ni))
+							return ni;
+						else if (long.TryParse(s, out nl))
+							return nl;
+						else if (System.Numerics.BigInteger.TryParse(s, out nb))
+							return nb;
+						else
+							return double.Parse(s);
+						
+				}
+			}
+		}
+		public object ParseSubtree()
+		{
+			IList<object> l = null;
+			IDictionary<string, object> d = null;
+			string rv;
+			object result = null;
+			switch (_state)
+			{
+				case -2:
+					return null;
+				case -1:
+					if (!Read())
+						_pc.Expecting();
+					return ParseSubtree();
+				case 0:
+					result = Value;
+					break;
+				case 1: // key
+					rv = Value as string;
+					if (!Read())
+						_pc.Expecting();
+					result = new KeyValuePair<string, object>(rv, ParseSubtree());
+					break;
+				case 2:// begin array
+					l = new JsonArray();
+					while (Read() && 3 != _state)
+					{
+						l.Add(ParseSubtree());
+					}
+					result = l;
+					break;
+				case 3: // end array
+					result = null;
+					break;
+				case 4:// begin object
+					d = new JsonObject();
+					while (Read() && 5 != _state) // not end object
+					{
+						KeyValuePair<string, object> kvp = (KeyValuePair<string, object>)ParseSubtree();
+						d.Add(kvp.Key, kvp.Value);
+					}
+					result = d;
+					break;
+				case 5:
+					result = null;
+					break;
+				default:
+					throw new InvalidProgramException("Unhandled state");
+			}
+			return result;
+		}
+		/// <summary>
+		/// Skips the subtree at the current node without parsing it
+		/// </summary>
+		/// <returns>True if there is more data to read</returns>
+		public bool SkipSubtree()
+		{
+			switch (_state)
+			{
+				case -2: // eos
+					return false;
+				case -1: // initial
+					if (!Read())
+						_pc.Expecting();
+					return SkipSubtree();
+				case 0: // value
+					return true;
+				case 1: // key
+					if (!Read())
+						_pc.Expecting();
+					return SkipSubtree();
+				case 2:// begin array
+					_SkipArrayPart();
+					_pc.TrySkipWhiteSpace();
+					_state = 3; // end array
+					return true;
+				case 3: // end array
+					return true;
+				case 4:// begin object
+					_SkipObjectPart();
+					_pc.TrySkipWhiteSpace();
+					_state = 5; // end object
+					return true;
+				case 5: // end object
+					return true;
+				default:
+					throw new InvalidProgramException("Unhandled state");
+			}
+		}
+		/// <summary>
+		/// Skips to the field with the specified name. Does not traverse descendants.
+		/// </summary>
+		/// <param name="key">The name of the field.</param>
+		/// <returns>True if the reader wound up on said, field, otherwise, false</returns>
+		/// <remarks>This will return false unless called from an object start or from a field.</remarks>
+		public bool SkipToField(string key, bool searchDescendants = false)
+		{
+			string okey = key;
+			key = JsonObject.DecorateString(okey);
+			string rv;
+
+			if (searchDescendants)
+			{
+				while (Read())
+				{
+					if (1 == _state)
+					{
+						rv = _pc.GetCapture();
+						if (key == rv)
+							return true;
+					}
+				}
+				return false;
+			}
+			switch (_state)
+			{
+				case -1:
+					if (Read())
+						return SkipToField(okey);
+					return false;
+				case 4:
+					while (Read() && 1 == _state) // first read will move to the child field of the root
+					{
+						rv = _pc.GetCapture();
+						if (key != rv && okey != rv)
+							SkipSubtree(); // if this field isn't the target so just skip over the rest of it
+						else
+							break;
+					}
+					return 1 == _state;
+				case 1: // we're already on a field
+					rv = _pc.GetCapture();
+					if (key == rv || okey == rv)
+						return true;
+					else if (!SkipSubtree())
+						return false;
+
+					while (Read() && 1 == _state) // first read will move to the child field of the root
+					{
+						rv = _pc.GetCapture();
+						if (key != rv && okey != rv)
+							SkipSubtree(); // if this field isn't the target just skip over the rest of it
+						else
+							break;
+					}
+					return 1 == _state;
+				default:
+					return false;
+			}
+
+		}
+
+		// optimization
+		private void _SkipObjectPart()
+		{
+			int depth = 1;
+			while (-1 != _pc.Current)
+			{
+				switch (_pc.Current)
+				{
+					case '{':
+						++depth;
+						_pc.Advance();
+						_pc.Expecting();
+						break;
+					case '\'':
+					case '\"':
+						_SkipString();
+						break;
+					case '}':
+						--depth;
+						if (depth == 0)
+						{
+							_pc.Advance();
+							return;
+						}
+						_pc.Expecting();
+						break;
+					default:
+						_pc.Advance();
+						break;
+				}
+			}
+		}
+		// optimization
+		private void _SkipArrayPart()
+		{
+			int depth = 1;
+			while (-1 != _pc.Current)
+			{
+				switch (_pc.Current)
+				{
+					case '[':
+						++depth;
+						_pc.Advance();
+						_pc.Expecting();
+						break;
+					case '\'':
+					case '\"':
+						_SkipString();
+						break;
+					case ']':
+						--depth;
+						if (depth == 0)
+						{
+							_pc.Advance();
+							return;
+						}
+						_pc.Expecting();
+						break;
+					default:
+						_pc.Advance();
+						break;
+				}
+			}
+		}
+		void _SkipString()
+		{
+			_pc.Expecting('\"');
+			_pc.Advance();
+			_pc.TrySkipUntil('\"', '\\', true);
+		}
+
+	}
+}
