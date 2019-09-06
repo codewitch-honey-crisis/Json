@@ -68,18 +68,25 @@ namespace TmdbApi
 				args["language"] = Language;
 			object result = null;
 			var retryCount = 0;
-			while (null == result && 11>retryCount)
+			while (null == result)
 			{
 				++retryCount;
 				try
 				{
-					System.Diagnostics.Debug.WriteLine("Requesting from " + url);
-					result = JsonRpc.Invoke(url, args, payload, null, httpMethod, fixupResult, fixupError, Tmdb.CacheLevel);
+					var s = JsonRpc.GetInvocationUrl(url, args);
+					System.Diagnostics.Debug.WriteLine("Requesting from " + s);
+					result = JsonRpc.Invoke(s, null/*we already computed the url*/, payload, null, httpMethod, fixupResult, fixupError, Tmdb.CacheLevel);
 					if (null == result)
 						break;
 				}
 				catch (JsonRpcException rex)
 				{
+					if (retryCount > 11)
+					{
+						rex.Json.Add("retry_count_exceeded:", retryCount - 1);
+						throw;
+					}
+					
 					// are we over the request limit?
 					if (25 == rex.ErrorCode)
 					{

@@ -182,11 +182,11 @@ namespace TmdbApi
 			// to US eastern standard time (UTC -5:00)
 			return _GetShows("airing_today", minPage, maxPage);
 		}
-		public static TmdbShow[] GetPopular(int minPage = 0, int maxPage = 999)
+		public static TmdbShow[] GetPopular(int minPage , int maxPage )
 		{
 			return _GetShows("popular", minPage, maxPage);
 		}
-		public static TmdbShow[] GetTopRated(int minPage = 0, int maxPage = 999)
+		public static TmdbShow[] GetTopRated(int minPage, int maxPage)
 		{
 			return _GetShows("top_rated", minPage, maxPage);
 		}

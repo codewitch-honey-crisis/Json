@@ -101,15 +101,15 @@ namespace TmdbApi
 		{
 			return _GetMovies("now_playing", region, minPage, maxPage);
 		}
-		public static TmdbMovie[] GetPopular(string region = null, int minPage = 0, int maxPage = 999)
+		public static TmdbMovie[] GetPopular(int minPage, int maxPage ,string region = null)
 		{
 			return _GetMovies("popular",region, minPage, maxPage);
 		}
-		public static TmdbMovie[] GetTopRated(string region = null, int minPage = 0, int maxPage = 999)
+		public static TmdbMovie[] GetTopRated(int minPage , int maxPage ,string region = null)
 		{
 			return _GetMovies("top_rated", region, minPage, maxPage);
 		}
-		public static TmdbMovie[] GetUpcoming(string region = null, int minPage = 0, int maxPage = 999)
+		public static TmdbMovie[] GetUpcoming(int minPage , int maxPage ,string region = null)
 		{
 			return _GetMovies("upcoming", region, minPage, maxPage);
 		}

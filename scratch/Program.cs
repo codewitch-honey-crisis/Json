@@ -17,7 +17,14 @@ namespace scratch
 			Tmdb.ApiKey = ApiKey;
 			Tmdb.CacheLevel = JsonRpcCacheLevel.Aggressive;
 			//_RunShowDemo();
-			foreach(var show in TmdbShow.GetTopRated())
+
+			// hit it *hard*
+			foreach (var movie in TmdbMovie.GetTopRated(0,9))
+			{
+				_RunMovieDemo(movie.Id);
+			}
+
+			foreach (var show in TmdbShow.GetTopRated(0,9))
 			{
 				_RunShowDemo(show.Id);
 			}
@@ -166,11 +173,11 @@ namespace scratch
 
 
 		}
-		static void _RunMovieDemo()
+		static void _RunMovieDemo(int movieId = -1)
 		{
 			// fetch a movie - this just grabs the top result. By default most 
 			// results from the API are sorted by popularity, most popular first.
-			var movie = Tmdb.SearchMovies("Star Wars", minPage: 0, maxPage: 0)[0];
+			var movie = (0> movieId) ? Tmdb.SearchMovies("Star Wars", minPage: 0, maxPage: 0)[0] : new TmdbMovie(movieId);
 			//Console.WriteLine(movie.Json); // write the json (may not be complete)
 
 			// A note about paged functions, like the SearchMovies() function above:
