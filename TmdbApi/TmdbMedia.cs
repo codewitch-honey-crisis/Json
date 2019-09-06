@@ -132,11 +132,7 @@ namespace TmdbApi
 					Json.Add("videos", l);
 			}
 		}
-		protected abstract TmdbMedia[] GetSimilarImpl(int minPage, int maxPage);
-		public TmdbMedia[] GetSimilar(int minPage=0,int maxPage=999)
-		{
-			return GetSimilarImpl(minPage, maxPage);
-		}
+		
 		public TmdbReview[] GetReviews(int minPage=0,int maxPage=999)
 		{
 			var l = Tmdb.CollapsePagedJson(

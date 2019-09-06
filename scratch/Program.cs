@@ -15,7 +15,12 @@ namespace scratch
 		static void Main()
 		{
 			Tmdb.ApiKey = ApiKey;
-			_RunShowDemo();
+			Tmdb.CacheLevel = JsonRpcCacheLevel.Aggressive;
+			//_RunShowDemo();
+			foreach(var show in TmdbShow.GetTopRated())
+			{
+				_RunShowDemo(show.Id);
+			}
 			
 		}
 		static void _RunCacheDemo2()
@@ -287,11 +292,11 @@ namespace scratch
 			//Console.WriteLine(movie.Json); // write the json again
 
 		}
-		static void _RunShowDemo()
+		static void _RunShowDemo(int id = 2919/*Burn Notice*/)
 		{
 			// fetch a show - you can use SearchShows() or if you already know the id
 			// of the object you want, just create it with the given id.
-			var show = new TmdbShow(2919); // star trek
+			var show = new TmdbShow(id); 
 			//Console.WriteLine(show.Json); // write the json - for now just an id
 
 		

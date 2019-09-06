@@ -15,6 +15,8 @@ namespace TmdbApi
 		{
 			InitializeCache();
 		}
+		public string Name => GetField<string>("name");
+
 		public override string[] PathIdentity => new string[] { "keyword", Id.ToString() };
 		protected override void Fetch()
 		{

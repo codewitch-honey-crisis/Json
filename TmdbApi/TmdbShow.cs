@@ -144,16 +144,13 @@ namespace TmdbApi
 			FetchJsonLang(null,_FixupJson);
 		}
 
-		public new TmdbShow[] GetSimilar(int minPage=0,int maxPage=999)
-		{
-			return (TmdbShow[])base.GetSimilar(minPage, maxPage);
-		}
-		protected override TmdbMedia[] GetSimilarImpl(int minPage, int maxPage)
+		public TmdbShow[] GetSimilar(int minPage=0,int maxPage=999)
 		{
 			return JsonArray.ToArray(Tmdb.CollapsePagedJson(
-					Tmdb.InvokePagedLang(string.Concat("/", string.Join("/", PathIdentity), "/similar"))),
-					(d) => new TmdbShow((IDictionary<string, object>)d));
+				Tmdb.InvokePagedLang(string.Concat("/", string.Join("/", PathIdentity), "/similar"),minPage,maxPage)),
+				(d) => new TmdbShow((IDictionary<string, object>)d));
 		}
+		
 		public static TmdbShow GetLatest()
 		{
 			var json = Tmdb.Invoke("/tv/latest");
@@ -174,6 +171,31 @@ namespace TmdbApi
 				Tmdb.InvokePaged(string.Concat("/trending/tv/", tw), minPage, maxPage));
 			return JsonArray.ToArray(l, (d) => new TmdbShow((IDictionary<string, object>)d));
 		}
-		
+		public static TmdbShow[] GetOnTheAir(int minPage = 0, int maxPage = 999)
+		{
+			return _GetShows("on_the_air", minPage, maxPage);
+		}
+		public static TmdbShow[] GetAiringToday(int minPage = 0, int maxPage = 999)
+		{
+			// TODO: supposedly you can specify a timezone but the api doesn't include
+			// it in the list of parameters. It apparently, for some reason defaults 
+			// to US eastern standard time (UTC -5:00)
+			return _GetShows("airing_today", minPage, maxPage);
+		}
+		public static TmdbShow[] GetPopular(int minPage = 0, int maxPage = 999)
+		{
+			return _GetShows("popular", minPage, maxPage);
+		}
+		public static TmdbShow[] GetTopRated(int minPage = 0, int maxPage = 999)
+		{
+			return _GetShows("top_rated", minPage, maxPage);
+		}
+		static TmdbShow[] _GetShows(string method, int minPage, int maxPage)
+		{
+			var args = new JsonObject();
+			var l = Tmdb.CollapsePagedJson(
+				Tmdb.InvokePagedLang(string.Concat("/tv/", method), minPage, maxPage, args));
+			return JsonArray.ToArray(l, (d) => new TmdbShow((IDictionary<string, object>)d));
+		}
 	}
 }

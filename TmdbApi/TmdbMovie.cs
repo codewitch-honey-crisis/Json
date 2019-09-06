@@ -113,6 +113,10 @@ namespace TmdbApi
 		{
 			return _GetMovies("upcoming", region, minPage, maxPage);
 		}
+		public static TmdbMovie[] GetSimilar(string region = null, int minPage = 0, int maxPage = 999)
+		{
+			return _GetMovies("similar", region, minPage, maxPage);
+		}
 		public static TmdbMovie[] GetTrending(TmdbTimeWindow window,int minPage=0,int maxPage=999)
 		{
 			string tw="day";
@@ -126,27 +130,17 @@ namespace TmdbApi
 				Tmdb.InvokePaged(string.Concat("/trending/movie/", tw), minPage, maxPage));
 			return JsonArray.ToArray(l, (d) => new TmdbMovie((IDictionary<string, object>)d));
 		}
-		public static TmdbMovie[] _GetMovies(string method,string region, int minPage, int maxPage)
+		static TmdbMovie[] _GetMovies(string method, string region, int minPage, int maxPage)
 		{
 			var args = new JsonObject();
 			if (null != region)
 				args.Add("region", region);
 			var l = Tmdb.CollapsePagedJson(
-				Tmdb.InvokePagedLang(string.Concat("/movie/",method), minPage, maxPage, args));
+				Tmdb.InvokePagedLang(string.Concat("/movie/", method), minPage, maxPage, args));
 			return JsonArray.ToArray(l, (d) => new TmdbMovie((IDictionary<string, object>)d));
 		}
-		
-		public new TmdbMovie[] GetSimilar(int minPage = 0, int maxPage = 999)
-		{
-			return (TmdbMovie[])base.GetSimilar(minPage, maxPage);
-		}
-		
-		protected override TmdbMedia[] GetSimilarImpl(int minPage, int maxPage)
-		{
-			return JsonArray.ToArray(Tmdb.CollapsePagedJson(
-					Tmdb.InvokePagedLang(string.Concat("/", string.Join("/", PathIdentity), "/similar"))),
-					(d) => new TmdbMovie((IDictionary<string, object>)d));
-		}
+
+
 		public static TmdbMovie GetLatest()
 		{
 			var json = Tmdb.Invoke("/movie/latest");
