@@ -24,6 +24,10 @@ namespace TmdbApi
 		{
 			InitializeCache();
 		}
+		public TmdbGender Gender =>(TmdbGender)GetCachedField("gender", 2);
+		public DateTime BornDate => Tmdb.DateToDateTime(GetCachedField<string>("birthday"));
+		public DateTime DeathDate => Tmdb.DateToDateTime(GetCachedField<string>("deathday"));
+		public string Biography => GetCachedField<string>("biography");
 		public override TmdbPrimaryType PrimaryType => TmdbPrimaryType.Person;
 		public override string[] PathIdentity 
 				=>new string[] { "person", Id.ToString() };

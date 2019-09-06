@@ -187,7 +187,7 @@ namespace Json
 				if (null == d)
 					throw new ArgumentException("Attempt to traverse a value that wasn't a JSON {object} type.",nameof(indicesAndKeys));
 				target = d[s];
-				if (indicesAndKeys.Length > index)
+				if (indicesAndKeys.Length-1 > index)
 					return _Get(target, indicesAndKeys, index + 1);
 				return target;
 			}
@@ -195,7 +195,7 @@ namespace Json
 			if (null == l)
 				throw new ArgumentException("Attempt to traverse a value that wasn't a JSON [list] type.", nameof(indicesAndKeys));
 			target = l[(int)o];
-			if (indicesAndKeys.Length > index)
+			if (indicesAndKeys.Length-1 > index)
 				return _Get(target, indicesAndKeys, index + 1);
 			return target;
 		}

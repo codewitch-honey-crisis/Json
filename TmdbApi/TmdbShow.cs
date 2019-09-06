@@ -45,11 +45,11 @@ namespace TmdbApi
 				}
 			}
 		}
-		public TmdbPerson CreatedBy {
+		public TmdbPerson[] CreatedBy {
 			get {
-				var d = GetCachedField<IDictionary<string, object>>("created_by");
-				if(null!=d)
-					return new TmdbPerson(d);
+				var l = GetCachedField<IList<object>>("created_by");
+				if (null != l)
+					return JsonArray.ToArray(l, (d) => new TmdbPerson((IDictionary<string, object>)d));
 				return null;
 			}
 		}
