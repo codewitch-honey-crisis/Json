@@ -51,7 +51,7 @@ namespace TmdbApi
 			var jo = Json as JsonObject; // should always be but it doesn't *have* to be
 			if(null!=jo)
 			{
-				jo.BaseDictionary.GetHashCode();
+				return jo.BaseDictionary.GetHashCode();
 			}
 			return Json.GetHashCode();
 		}

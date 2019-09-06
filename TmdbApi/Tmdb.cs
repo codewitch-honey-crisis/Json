@@ -67,8 +67,10 @@ namespace TmdbApi
 			if (sendLang && !string.IsNullOrEmpty(Language))
 				args["language"] = Language;
 			object result = null;
-			while (null == result)
+			var retryCount = 0;
+			while (null == result && 11>retryCount)
 			{
+				++retryCount;
 				try
 				{
 					System.Diagnostics.Debug.WriteLine("Requesting from " + url);
@@ -81,14 +83,15 @@ namespace TmdbApi
 					// are we over the request limit?
 					if (25 == rex.ErrorCode)
 					{
-						System.Diagnostics.Debug.WriteLine(rex.Message+".. throttling "+url);
+						System.Diagnostics.Debug.WriteLine(rex.Message + ".. throttling " + url);
 						// wait and try again
 						Thread.Sleep(RequestThrottleDelay);
 					}
 					else if (-39 == rex.ErrorCode)
-						break;
+						continue;//malformed or empty json, try again
 					else
 						throw;
+					
 				}
 			}
 			//if (null == result)
