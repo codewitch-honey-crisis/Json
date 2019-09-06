@@ -51,7 +51,7 @@ namespace TmdbApi
 		public string BackdropPath => GetCachedField<string>("backdrop_path");
 		public double Popularity => GetCachedField("popularity", 0d);
 		public double VoteAverage => GetCachedField("vote_average", 0d);
-		public double VoteCount => GetCachedField("vote_count", 0);
+		public int VoteCount => GetCachedField("vote_count", 0);
 		
 		public TmdbCastMember[] Cast {
 			get {

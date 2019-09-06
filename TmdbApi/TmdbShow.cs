@@ -126,7 +126,7 @@ namespace TmdbApi
 						{
 							if (-1 < Id)
 								season["show_id"] = Id;
-							result[i] = new TmdbSeason(season);
+							result.Add(new TmdbSeason(season));
 						}
 						++i;
 					}

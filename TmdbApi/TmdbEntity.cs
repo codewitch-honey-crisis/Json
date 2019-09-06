@@ -38,10 +38,14 @@ namespace TmdbApi
 		}
 		public static bool operator==(TmdbEntity lhs, TmdbEntity rhs)
 		{
+			if (object.ReferenceEquals(lhs, rhs)) return true;
+			if (object.ReferenceEquals(lhs, null)) return false;
 			return lhs.Equals(rhs);
 		}
 		public static bool operator!=(TmdbEntity lhs, TmdbEntity rhs)
 		{
+			if (object.ReferenceEquals(lhs, rhs)) return false;
+			if (object.ReferenceEquals(lhs, null)) return true;
 			return !lhs.Equals(rhs);
 		}
 		public override int GetHashCode()

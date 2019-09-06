@@ -18,7 +18,7 @@ namespace scratch
 			Tmdb.CacheLevel = JsonRpcCacheLevel.Aggressive;
 			//_RunShowDemo();
 
-			// hit it *hard*
+			// hit it *hard* - 10 pages of movies, 10 of TV
 			foreach (var movie in TmdbMovie.GetTopRated(0,9))
 			{
 				_RunMovieDemo(movie.Id);

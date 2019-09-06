@@ -38,6 +38,7 @@ namespace TmdbApi
 				return GetField("season_number", -1);
 			}
 		}
+		public string PosterPath => GetCachedField<string>("poster_path");
 		static IDictionary<string,object> _CreateJson(int showId,int seasonNumber)
 		{
 			var result = new JsonObject();
