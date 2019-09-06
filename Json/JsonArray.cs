@@ -91,12 +91,16 @@ namespace Json
 		{
 			return ToArray(this,createItem);
 		}
-		public static T[] ToArray<T>(IList<object> list, Func<object,T> createItem)
+		public static T[] ToArray<T>(IList<object> list, Func<object, T> createItem)
 		{
-			var result = new T[list.Count];
-			for (var i = 0; i < result.Length; ++i)
-				result[i] = createItem(list[i]);
-			return result;
+			if (null != list)
+			{ 
+				var result = new T[list.Count];
+				for (var i = 0; i < result.Length; ++i)
+					result[i] = createItem(list[i]);
+				return result;
+			}
+			return null;
 		}
 		public static T[] ToArray<T>(IList<object> list)
 		{

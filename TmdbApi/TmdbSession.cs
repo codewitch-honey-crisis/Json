@@ -5,18 +5,22 @@ using System.Text;
 
 namespace TmdbApi
 {
-	public sealed class TmdbSession : TmdbCachedEntityWithId2, IDisposable
+	public sealed class TmdbSession : TmdbEntity, IDisposable
 	{
 		bool _isDisposed = false;
-		public TmdbSession(string id) : base(id)
-		{
-			// not cached
+		public TmdbSession(string id) : base(_CreateJson(id))
+		{	
+		}
+		static IDictionary<string,object> _CreateJson(string id) {
+			var result = new JsonObject();
+			result.Add("id", id);
+			return result;
 		}
 		public TmdbSession(IDictionary<string,object> json) : base(json)
 		{
 			// not cached
 		}
-		public override string[] PathIdentity => null;
+		public string Id => GetField<string>("id");
 		public TmdbMovieList CreateMovieList(string name = null, string description = null, string language = null)
 		{
 			_CheckDisposed();

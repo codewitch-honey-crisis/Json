@@ -5,17 +5,22 @@ using System.Text;
 
 namespace TmdbApi
 {
-	public sealed class TmdbGuestSession :TmdbCachedEntityWithId2
+	public sealed class TmdbGuestSession :TmdbEntity
 	{
-		public TmdbGuestSession(string id) : base(id)
+		public TmdbGuestSession(string id) : base(_CreateJson(id))
 		{
-			// not cached
 		}
 		public TmdbGuestSession(IDictionary<string,object> json) : base(json)
 		{
-			// not cached
 		}
-		public override string[] PathIdentity => null;
+		public string Id => GetField<string>("id");
+
+		static IDictionary<string, object> _CreateJson(string id)
+		{
+			var result = new JsonObject();
+			result.Add("id", id);
+			return result;
+		}
 
 		public TmdbShow[] RatedShows {
 			get {

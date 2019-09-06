@@ -15,8 +15,8 @@ namespace scratch
 		static void Main()
 		{
 			Tmdb.ApiKey = ApiKey;
-			Tmdb.CacheLevel = JsonRpcCacheLevel.Aggressive;
-			_RunCacheDemo();
+			_RunShowDemo();
+			
 		}
 		static void _RunCacheDemo2()
 		{
@@ -116,7 +116,7 @@ namespace scratch
 			// is. That means The Practice will get filled in with any additional 
 			// data returned from the search query. 
 			var showComparand = Tmdb.SearchShows("The Practice", minPage: 0, maxPage: 0)[0];
-
+		
 			// check to make sure showComparand and show are actually two different TmdbShow wrapper instances
 			// should report that they are different
 			Console.WriteLine("Instances are {0} actual objects", ReferenceEquals(show, showComparand) ? "the same" : "different");
@@ -291,7 +291,7 @@ namespace scratch
 		{
 			// fetch a show - you can use SearchShows() or if you already know the id
 			// of the object you want, just create it with the given id.
-			var show = new TmdbShow(253); // star trek
+			var show = new TmdbShow(2919); // star trek
 			//Console.WriteLine(show.Json); // write the json - for now just an id
 
 		
@@ -306,11 +306,14 @@ namespace scratch
 			Console.WriteLine(name);
 			Console.WriteLine(overview);
 			Console.WriteLine();
-
+			//
 			// write out the genres
 			Console.Write("Genres:");
-			foreach (var g in show.GenresById)
-				Console.Write(string.Concat(" ", g.Value));
+			var gbid = show.GenresById;
+			if (null != gbid) {
+				foreach (var g in gbid)
+					Console.Write(string.Concat(" ", g.Value));
+			}
 			Console.WriteLine();
 
 			Console.WriteLine();

@@ -71,6 +71,7 @@ namespace TmdbApi
 			{
 				try
 				{
+					System.Diagnostics.Debug.WriteLine("Requesting from " + url);
 					result = JsonRpc.Invoke(url, args, payload, null, httpMethod, fixupResult, fixupError, Tmdb.CacheLevel);
 					if (null == result)
 						break;
@@ -80,6 +81,7 @@ namespace TmdbApi
 					// are we over the request limit?
 					if (25 == rex.ErrorCode)
 					{
+						System.Diagnostics.Debug.WriteLine(rex.Message+".. throttling "+url);
 						// wait and try again
 						Thread.Sleep(RequestThrottleDelay);
 					}
@@ -131,6 +133,8 @@ namespace TmdbApi
 							if (d.TryGetValue("total_pages", out o) && o is int)
 							{
 								var p = ((int)o) - 1;
+								if (0 > p)
+									p = 0;
 								if (-1 != p)
 								{
 									if (maxPage > p)
