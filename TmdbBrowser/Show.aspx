@@ -41,6 +41,13 @@
             font-weight: 700;
             margin-bottom: 1em;
         }
+		.darkbgtext {
+            font-family: 'Gruppo';
+            text-decoration: none;
+            color: white;
+			background-color: rgba(7,7,26,.6);
+            font-weight: 700;
+        }
 		header span {
 		            font-size: 1.5em;
 		}
@@ -159,7 +166,31 @@ body {
   -o-background-size: cover;
   background-size: cover;
 }
+	 div.gallery {
+  margin: 5px;
+  border: 1px solid #ccc;
+  float: left;
+  width: 182px;
+}
 
+div.gallery:hover {
+  border: 1px solid #777;
+}
+
+.gallery_img {
+  width: 180px;
+  height: 250px;
+  object-fit:contain;
+  color: white;
+  margin: 0px;
+  padding: 0px;
+  background-color: rgba(7,7,26,.6);
+}
+
+div.desc {
+  padding: 15px;
+  text-align: center;
+}
 <%}%>
     </style>
 	
@@ -188,11 +219,15 @@ body {
 		</section>
 		<section>
 			<%foreach (var season in show.Seasons){
-					if(0!=season.Number) // don't want specials
-					{
+				
 			%>
-				<div style="float:left"><img src="<%=TmdbApi.Tmdb.GetImageUrl(season.PosterPath)%>"</div>
-			<%}}%>
+			<div class="gallery">
+  <a target="_blank" href="#">
+    <div class="gallery_img" style="background-size:contain; background-position-x:center; background-repeat:no-repeat; background-image:url('<%=TmdbApi.Tmdb.GetImageUrl(Denull(season.PosterPath,"/"),TmdbApi.Tmdb.Configuration.Images.PosterSizes[1])%>');"></div>
+	</a>
+ <div class="desc darkbgtext"><%=season.Name%></div>
+</div>
+			<%}%>
 			
 		</section>
     </main>    

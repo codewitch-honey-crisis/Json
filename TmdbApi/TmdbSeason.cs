@@ -38,7 +38,9 @@ namespace TmdbApi
 				return GetField("season_number", -1);
 			}
 		}
+		public string Name => GetCachedField<string>("name");
 		public string PosterPath => GetCachedField<string>("poster_path");
+		public int Season => GetCachedField<int>("number_of_episodes");
 		static IDictionary<string,object> _CreateJson(int showId,int seasonNumber)
 		{
 			var result = new JsonObject();
@@ -125,7 +127,7 @@ namespace TmdbApi
 							if (-1 < sid)
 								episode["show_id"] = sid;
 							episode["season_number"] = Number;
-							result[i] = new TmdbEpisode(episode);
+							result.Add(new TmdbEpisode(episode));
 						}
 						++i;
 					}
