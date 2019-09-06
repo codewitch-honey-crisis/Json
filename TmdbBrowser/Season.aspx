@@ -1,12 +1,14 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Show.aspx.cs" Inherits="TmdbBrowser.Show" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Season.aspx.cs" Inherits="TmdbBrowser.Season" %>
 <%@ assembly name="System.Core" %>
 <%@ import namespace="System.Text" %>
 <%@ import namespace="System.Collections.Generic" %>
+<%@ import namespace="Json" %>
+<%@ import namespace="TmdbApi" %>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>media\tv\<%=show.Name%></title>
+    <title>media\tv\<%=show.Name%>\<%=season.Name%></title>
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"
           rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1"
@@ -179,7 +181,7 @@ div.gallery:hover {
 
 .gallery_img {
   width: 180px;
-  height: 250px;
+  height: 102px;
   object-fit:contain;
   color: white;
   margin: 0px;
@@ -198,7 +200,7 @@ div.desc {
 <body>
     <header>
         <span>
-            <a href="Default.aspx">media</a><a href="SearchShows.aspx">\tv</a><a href="#">\<%=show.Name%></a>
+            <a href="Default.aspx">media</a><a href="SearchShows.aspx">\tv</a><a href="Show.aspx?show=<%=show.Id%>">\<%=show.Name%></a><a href="#">\<%=season.Name%></a>
         </span>
         <div style="float:right; display: inline-block;">
             <form action="SearchShows.aspx" method="GET" class="searchform w3-round-xlarge">
@@ -207,7 +209,7 @@ div.desc {
 			</form>
         </div>
 		<div style="width:100%;text-align:center;">
-			<div style="display:inline-block;">Runtime is <%=Math.Round(ApproxRunTime.TotalHours)%> hours</div>
+			<div style="display:inline-block;">Runtime is <%=ApproxRunTime.TotalHours%> hours</div>
 			<div style="float:right; font-family:Gruppo"><%
 						if(0<show.VoteCount) { %>
 						<div class="w3-grey w3-round-xlarge" style="width:200px;">
@@ -231,15 +233,12 @@ div.desc {
             </div>
 		</section>
 		<section>
-			<%foreach (var season in show.Seasons){
-				
-			%>
+			<%foreach (var episode in season.Episodes){%>
 			<div class="gallery">
-  <a target="_blank" href="Season.aspx?show<%=show.Id%>&season=<%=season.Number%>">
-    <div class="gallery_img" style="background-size:contain; background-position-x:center; background-repeat:no-repeat; background-image:url('<%=TmdbApi.Tmdb.GetImageUrl(Denull(season.PosterPath,"/"),TmdbApi.Tmdb.Configuration.Images.PosterSizes[1])%>');"></div>
+  <a href="Episode.aspx?show=<%=show.Id%>&season=<%=season.Number%>&episode=<%=episode.Number%>">
+    <div class="gallery_img" style="background-size:contain; background-position-x:center; background-repeat:no-repeat; background-image:url('<%=TmdbApi.Tmdb.GetImageUrl(Denull(episode.StillPath,"/"))%>');"></div>
 	</a>
-				<%var episodeCount = season.Episodes.Length; %>
- <div class="desc darkbgtext"><%=season.Name%><br /><%=episodeCount%> Episode<%=1!=episodeCount?"s":""%></div>
+ <div class="desc darkbgtext"><%=episode.Name%><br /><%=episode.AirDate.ToLongDateString()%></div>
 </div>
 			<%}%>
 			

@@ -69,6 +69,7 @@
   <ItemGroup>
     <Content Include="SearchShows.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Season.aspx" />
     <Content Include="Show.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -84,6 +85,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Season.aspx.cs">
+      <DependentUpon>Season.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Season.aspx.designer.cs">
+      <DependentUpon>Season.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Show.aspx.cs">
       <DependentUpon>Show.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

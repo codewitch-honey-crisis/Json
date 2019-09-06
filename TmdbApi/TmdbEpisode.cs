@@ -50,6 +50,7 @@ namespace TmdbApi
 				return GetField("episode_number", -1);
 			}
 		}
+		public string Name => GetCachedField<string>("name");
 		static IDictionary<string, object> _CreateJson(int showId, int seasonNumber,int episodeNumber)
 		{
 			var result = new JsonObject();

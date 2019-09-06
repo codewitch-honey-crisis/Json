@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>c:\&gt;media</title>
+    <title>media</title>
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet" />
@@ -174,7 +174,7 @@
 <body>
     <header>
         <span>
-            <a href="Default.aspx">c:\&gt;media</a><a href="SearchShows.aspx">\tv</a>
+            <a href="Default.aspx">media</a><a href="SearchShows.aspx">\tv</a>
         </span>
         <div style="float:right;margin-top:30px;">
             <form action="" method="get">

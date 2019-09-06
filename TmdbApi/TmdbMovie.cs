@@ -89,8 +89,8 @@ namespace TmdbApi
 				}
 			}
 		}
-		
-		
+		public TimeSpan RunTime => new TimeSpan(0, GetCachedField("runtime", 0), 0);
+
 		public TmdbMovieList[] GetLists(int minPage=0,int maxPage=999)
 		{
 			var l = Tmdb.CollapsePagedJson(

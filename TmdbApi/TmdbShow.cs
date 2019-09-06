@@ -53,7 +53,55 @@ namespace TmdbApi
 				return null;
 			}
 		}
-		public TimeSpan EpisodeRunTime => new TimeSpan(0,GetCachedField("episode_runtime" ,0),0);
+		public TimeSpan EpisodeRunTime {
+			get {
+				var arr = EpisodeRunTimes;
+				if (null != arr && 0 < arr.Length)
+					return arr[0];
+				return new TimeSpan(0);
+			}
+		}
+		// because specials is season 0 sometimes, this is a helper
+		// to grab the actual first season
+		public TmdbSeason FirstSeason {
+			get {
+				var d = GetCachedField<IDictionary<string, object>>("seasons");
+				if(null!=d)
+				{
+					object o;
+					if(d.TryGetValue("1", out o))
+					{
+						var dd = o as IDictionary<string, object>;
+						if(null!=dd)
+						{
+							return new TmdbSeason(dd);
+						}
+					}
+				}
+				return null;
+			}
+		}
+		// optimized way to get season by it's official number
+		public TmdbSeason GetSeasonByNumber(int seasonNumber) {
+			
+			var d = GetCachedField<IDictionary<string, object>>("seasons");
+			if (null != d)
+			{
+				object o;
+				if (d.TryGetValue(seasonNumber.ToString(), out o))
+				{
+					var dd = o as IDictionary<string, object>;
+					if (null != dd)
+					{
+						return new TmdbSeason(dd);
+					}
+				}
+			}
+			return null;
+			
+		}
+		public TimeSpan[] EpisodeRunTimes
+			=> JsonArray.ToArray(GetCachedField<IList<object>>("episode_run_time"), (i) => new TimeSpan(0, (int)i, 0));
 		public DateTime FirstAirDate => Tmdb.DateToDateTime(GetCachedField<string>("first_air_date"));
 		public bool InProduction => GetCachedField("in_production", false);
 		public DateTime LastAirDate => Tmdb.DateToDateTime(GetCachedField<string>("last_air_date"));
@@ -80,7 +128,7 @@ namespace TmdbApi
 		// no idea why this is singular
 		public string[] OriginCountries => JsonArray.ToArray<string>(GetCachedField<IList<object>>("origin_country"));
 
-		static object _FixupJson(object json)
+		object _FixupJson(object json)
 		{
 			var result = json;
 			var d = json as IDictionary<string, object>;
@@ -102,6 +150,7 @@ namespace TmdbApi
 								if (season.TryGetValue("season_number", out o) && o is int)
 								{
 									var sn = (int)o;
+									season["show_id"] = Id;
 									newSeasons.Add(sn.ToString(), season);
 								}
 							}

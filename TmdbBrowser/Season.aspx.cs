@@ -8,7 +8,7 @@ using TmdbApi;
 
 namespace TmdbBrowser
 {
-	public partial class Show : System.Web.UI.Page
+	public partial class Season : System.Web.UI.Page
 	{
 		protected void Page_Load(object sender, EventArgs e)
 		{
@@ -16,16 +16,25 @@ namespace TmdbBrowser
 			if (!string.IsNullOrEmpty(s))
 			{
 				int showId = -1;
-				if(int.TryParse(s,out showId))
+				if (int.TryParse(s, out showId))
 				{
 					show = new TmdbShow(showId);
 				}
 			}
 			if (null == show)
 				show = new TmdbShow(2919);
+			s = Request["season"];
+			if(!string.IsNullOrEmpty(s))
+			{
+				var i = 0;
+				if (int.TryParse(s, out i))
+					season = show.GetSeasonByNumber(i);
+			}
+			if (null == season)
+				season = show.FirstSeason;
 		}
-		public int tvid = -1;
 		public TmdbShow show = null;
+		public TmdbSeason season = null;
 		public string HtmlEncodeElem(string str)
 		{
 			if (null == str) str = "";
@@ -36,8 +45,7 @@ namespace TmdbBrowser
 			if (null == str) return @default == null ? "" : @default;
 			return str;
 		}
-		protected TimeSpan ApproxRunTime
-		{
+		protected TimeSpan ApproxRunTime {
 			get {
 				return new TimeSpan(0, (int)(show.EpisodeRunTime.TotalMinutes * show.TotalEpisodes), 0);
 			}
