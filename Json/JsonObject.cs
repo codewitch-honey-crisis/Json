@@ -297,6 +297,8 @@ namespace Json
 		}
 		static void _MergeReplace(object src, object dst, HashSet<object> visited)
 		{
+			if (ReferenceEquals(src, dst))
+				return;
 			if (!visited.Add(src))
 				return;
 			if (null == src || null == dst) return;

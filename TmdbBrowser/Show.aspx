@@ -235,12 +235,14 @@ div.desc {
 				
 			%>
 			<div class="gallery">
-  <a target="_blank" href="Season.aspx?show<%=show.Id%>&season=<%=season.Number%>">
+  <a href="Season.aspx?show=<%=show.Id%>&season=<%=season.Number%>">
     <div class="gallery_img" style="background-size:contain; background-position-x:center; background-repeat:no-repeat; background-image:url('<%=TmdbApi.Tmdb.GetImageUrl(Denull(season.PosterPath,"/"),TmdbApi.Tmdb.Configuration.Images.PosterSizes[1])%>');"></div>
-	</a>
+	
 				<%var episodeCount = season.Episodes.Length; %>
  <div class="desc darkbgtext"><%=season.Name%><br /><%=episodeCount%> Episode<%=1!=episodeCount?"s":""%></div>
+</a>
 </div>
+			
 			<%}%>
 			
 		</section>

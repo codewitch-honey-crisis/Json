@@ -9,13 +9,15 @@ namespace TmdbApi
 	{
 		public TmdbSeason(int showId,int seasonNumber) : base(_CreateJson(showId,seasonNumber))
 		{
-			_FixupJson(Json);
 			InitializeCache();
+			_FixupJson(Json);
+			
 		}
 		public TmdbSeason(IDictionary<string,object> json) : base(json)
 		{
-			_FixupJson(Json);
 			InitializeCache();
+			_FixupJson(Json);
+			
 		}
 		// /tv/{show_id}/seasons/{season_number}
 		public override string[] PathIdentity 
@@ -74,7 +76,8 @@ namespace TmdbApi
 							}
 						}
 					}
-					d["episodes"] = newEpisodes;
+					d["episode"] = newEpisodes;
+					d.Remove("episodes");
 				}
 			}
 			return json;
@@ -114,7 +117,7 @@ namespace TmdbApi
 		public TmdbEpisode[] Episodes {
 			get {
 				var sid = (null != Show) ? Show.Id : -1;
-				var episodes = GetCachedField<IDictionary<string,object>>("episodes");
+				var episodes = GetCachedField<IDictionary<string,object>>("episode");
 				if (null != episodes)
 				{
 					var result = new List<TmdbEpisode>(episodes.Count);

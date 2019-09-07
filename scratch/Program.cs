@@ -82,7 +82,7 @@ namespace scratch
 			//Tmdb.SaveCacheTo(@"..\..\cache.json");
 			// we won't use the above helper method since we want our cache to
 			// be pretty printed
-			JsonObject.SaveTo(Tmdb.Json, @"..\..\cache.json", "\t");
+			JsonObject.SaveTo(Tmdb.Json, @"..\..\cache.json", "    ");
 
 
 			// Note that the cache is thread static. It's per thread instance.
@@ -162,8 +162,7 @@ namespace scratch
 			// a server app or a long running desktop app should clear it periodically, but doing
 			// so will make a bunch of HTTP requests happen again, even if they already happened 
 			// since they weren't cached anymore. 
-			// It might be possible to implement double caching with disk in between in the future
-			// but for now I've punted it.
+			// The HTTP requests might be cached through the second level caching mechanism.
 			// 
 			// if you like, you can save and load the cache from disk, that way you can keep the cache
 			// across application runs. Eventually it will get big and stale though. In the future I
@@ -181,8 +180,8 @@ namespace scratch
 
 			// A note about paged functions, like the SearchMovies() function above:
 			// Be careful not specifying pages. Some searches can return a lot of results.
-			// if you want to limit the pages, specify BOTH parameters. Each one is 1 based. 
-			// The first page is 1. If they are unspecified, all pages are returned. This 
+			// if you want to limit the pages, specify BOTH parameters. Each one is 0 based. 
+			// The first page is 0. If they are unspecified, all pages are returned. This 
 			// will take several HTTP requests in most cases. Some of the paged functions
 			// *require* the minPage and maxPage parameters. They'll still accept zero and 
 			// behave the same way, but typically, some of these functions may return 

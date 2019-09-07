@@ -84,7 +84,7 @@ namespace TmdbApi
 		// optimized way to get season by it's official number
 		public TmdbSeason GetSeasonByNumber(int seasonNumber) {
 			
-			var d = GetCachedField<IDictionary<string, object>>("seasons");
+			var d = GetCachedField<IDictionary<string, object>>("season");
 			if (null != d)
 			{
 				object o;
@@ -155,7 +155,8 @@ namespace TmdbApi
 								}
 							}
 						}
-						d["seasons"] = newSeasons;
+						d["season"] = newSeasons;
+						d.Remove("seasons");
 					}
 				}
 			}
@@ -163,7 +164,7 @@ namespace TmdbApi
 		}
 		public TmdbSeason[] Seasons {
 			get {
-				var seasons = GetCachedField<IDictionary<string,object>>("seasons");
+				var seasons = GetCachedField<IDictionary<string,object>>("season");
 				if (null != seasons)
 				{
 					var result = new List<TmdbSeason>(seasons.Count);
