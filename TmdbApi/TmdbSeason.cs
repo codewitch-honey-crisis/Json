@@ -131,7 +131,6 @@ namespace TmdbApi
 						}
 						++i;
 					}
-					// TODO: move this to the fixup routine for better perf
 					result.Sort((lhs, rhs) => { return lhs.Number.CompareTo(rhs.Number); });
 					return result.ToArray();
 				}

@@ -5,16 +5,17 @@ using System.Text;
 
 namespace TmdbApi
 {
+	/// <summary>
+	/// Represents a basic entity in the TmdbApi library
+	/// </summary>
+	/// <remarks>This object uses a custom form of refernce semantics for equality comparison - it's Json property is compared.</remarks>
 	public abstract class TmdbEntity : IEquatable<TmdbEntity>
 	{
 		protected TmdbEntity(IDictionary<string, object> json)
 		{
 			Json = json ?? throw new ArgumentNullException(nameof(json));
 		}
-		
 		public IDictionary<string, object> Json { get; protected set; }
-
-		
 		protected T GetField<T>(string name,T @default=default(T))
 		{
 			object o;
@@ -50,11 +51,13 @@ namespace TmdbApi
 		}
 		public override int GetHashCode()
 		{
-			// we need the actual base hashcode, not the one
-			// computed by the JsonObject.
 			var jo = Json as JsonObject; // should always be but it doesn't *have* to be
 			if(null!=jo)
 			{
+				// we don't want our wrapper's hashcode since
+				// JsonObject implements value semantics
+				// So get the "real" dictionary and 
+				// GetHashCode() on that.
 				return jo.BaseDictionary.GetHashCode();
 			}
 			return Json.GetHashCode();

@@ -13,45 +13,15 @@ namespace TmdbApi
 	}
 	public class TmdbImage : TmdbEntity
 	{
-		public TmdbImage(IDictionary<string,object> json) : base(json)
-		{
-		}
+		public TmdbImage(IDictionary<string,object> json) : base(json) {}
 		
-		public int Width {
-			get {
-				return GetField("width",0);
-			}
-		}
-		public int Height {
-			get {
-				return GetField("height", 0);
-			}
-		}
-		public double AspectRatio {
-			get {
-				return GetField("aspect_ratio", 0);
-			}
-		}
-		public string Path {
-			get {
-				return GetField<string>("file_path");
-			}
-		}
-		public string Language {
-			get {
-				return GetField<string>("iso_639_1");
-			}
-		}
-		public double VoteAverage {
-			get {
-				return GetField("vote_average",0d);
-			}
-		}
-		public int VoteCount {
-			get {
-				return GetField("vote_count", 0);
-			}
-		}
+		public int Width => GetField("width",0);
+		public int Height => GetField("height", 0);
+		public double AspectRatio => GetField("aspect_ratio", 0);
+		public string Path => GetField<string>("file_path");
+		public string Language => GetField<string>("iso_639_1");
+		public double VoteAverage => GetField("vote_average",0d);
+		public int VoteCount => GetField("vote_count", 0);
 		public TmdbImageType ImageType {
 			get {
 				switch(GetField<string>("image_type", null))

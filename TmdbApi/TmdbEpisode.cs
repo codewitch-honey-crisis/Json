@@ -7,9 +7,18 @@ namespace TmdbApi
 {
 	public sealed class TmdbEpisode : TmdbCachedEntity
 	{
-		public TmdbEpisode(int showId, int seasonNumber,int episodeNumber) : base(_CreateJson(showId, seasonNumber,episodeNumber))
+		public TmdbEpisode(int showId, int seasonNumber,int episodeNumber) : 
+			base(_CreateJson(showId, seasonNumber,episodeNumber))
 		{
 			InitializeCache();
+		}
+		static IDictionary<string, object> _CreateJson(int showId, int seasonNumber, int episodeNumber)
+		{
+			var result = new JsonObject();
+			result.Add("show_id", showId);
+			result.Add("season_number", seasonNumber);
+			result.Add("episode_number", episodeNumber);
+			return result;
 		}
 		public TmdbEpisode(IDictionary<string, object> json) : base(json)
 		{
@@ -45,20 +54,10 @@ namespace TmdbApi
 				return null;
 			}
 		}
-		public int Number {
-			get {
-				return GetField("episode_number", -1);
-			}
-		}
+		public int Number => GetField("episode_number", -1);
+		
 		public string Name => GetCachedField<string>("name");
-		static IDictionary<string, object> _CreateJson(int showId, int seasonNumber,int episodeNumber)
-		{
-			var result = new JsonObject();
-			result.Add("show_id", showId);
-			result.Add("season_number", seasonNumber);
-			result.Add("episode_number", episodeNumber);
-			return result;
-		}
+		
 		public DateTime AirDate => Tmdb.DateToDateTime(GetCachedField<string>("air_date"));
 		// TODO: this keeps a copy of crew around but we load it with the credits
 		// I think it's the same data but I can't be positive, and also if it is
@@ -311,7 +310,6 @@ namespace TmdbApi
 			var json = Tmdb.Invoke(string.Concat("/", string.Join("/", PathIdentity), "/credits"));
 			if (null != json)
 				Json["credits"] = json;
-
 		}
 		void _EnsureFetchedExternalIds()
 		{

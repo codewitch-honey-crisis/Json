@@ -16,17 +16,7 @@ namespace scratch
 		{
 			Tmdb.ApiKey = ApiKey;
 			Tmdb.CacheLevel = JsonRpcCacheLevel.Aggressive;
-			var show2 = new TmdbShow(2919);
-			var person = show2.CreatedBy[0];
-			var showData = show2.Json;
-			Console.WriteLine(JsonObject.Get(showData, "created_by", 0,"name") as string);
-			return;
-			var s = show2.Name;
-			var bio= person.Biography;
-			Console.WriteLine(person.Json);
-			return;
-			//_RunShowDemo();
-
+			
 			// hit it *hard* - 10 pages of movies, 10 of TV
 			foreach (var movie in TmdbMovie.GetTopRated(0,9))
 			{

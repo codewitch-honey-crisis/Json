@@ -98,11 +98,8 @@ namespace TmdbApi
 						continue;//malformed or empty json, try again
 					else
 						throw;
-					
 				}
 			}
-			//if (null == result)
-			//	throw new Exception("Error in response.");
 			return result;
 		}
 		static IDictionary<string, object> _InvokePaged(string path, bool sendLang, int minPage, int maxPage, IDictionary<string, object> args, Func<object, object> fixupResultItem, Func<object, object> fixupError)
