@@ -242,7 +242,7 @@ div.desc {
 					<div style="float:right;"><%
 						if(0<episode.VoteCount) { %>
 						<div class="w3-grey w3-round-xlarge" style="width:200px;">
-							<div class="w3-container w3-round-xlarge w3-white" style="width:<%=(int)(episode.VoteAverage*10)%>%"><%=episode.VoteAverage%>/10&nbsp;(<%=episode.VoteCount%>&nbsp;vote<%=1!=episode.VoteCount?"s":""%>)</div>
+							<div class="w3-container w3-round-xlarge w3-white" style="width:<%=(int)(episode.VoteAverage*10)%>%"><%=Math.Round(episode.VoteAverage*10)/10%>/10&nbsp;(<%=episode.VoteCount%>&nbsp;vote<%=1!=episode.VoteCount?"s":""%>)</div>
 						</div>
 						<% } else {%>
 						<div class="w3-grey w3-round-xlarge" style="width:200px;">

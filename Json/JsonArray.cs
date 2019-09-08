@@ -20,12 +20,11 @@ namespace Json
 
 		public int Count => _inner.Count;
 
-		public bool IsReadOnly => ((IList<object>)_inner).IsReadOnly;
+		public bool IsReadOnly => _inner.IsReadOnly;
 
 		public void Add(object item)
-		{
-			_inner.Add(item);
-		}
+			=>_inner.Add(item);
+		
 		public void AddRange(IEnumerable<object> items)
 		{
 			foreach (var item in items)
@@ -33,29 +32,23 @@ namespace Json
 		}
 
 		public void Clear()
-		{
-			_inner.Clear();
-		}
+			=>_inner.Clear();
+		
 
 		public bool Contains(object item)
-		{
-			return _inner.Contains(item);
-		}
+			=>_inner.Contains(item);
+		
 
 		public void CopyTo(object[] array, int arrayIndex)
-		{
-			_inner.CopyTo(array, arrayIndex);
-		}
+			=>_inner.CopyTo(array, arrayIndex);
+		
 
 		public IEnumerator<object> GetEnumerator()
-		{
-			return _inner.GetEnumerator();
-		}
-
+			=> _inner.GetEnumerator();
+		
 		public int IndexOf(object item)
-		{
-			return _inner.IndexOf(item);
-		}
+			=> _inner.IndexOf(item);
+		
 		public int LastIndexOf(object item)
 		{
 			for (var i = _inner.Count - 1; -1 < i; --i)
@@ -65,32 +58,27 @@ namespace Json
 		}
 
 		public void Insert(int index, object item)
-		{
-			_inner.Insert(index, item);
-		}
-
+			=>_inner.Insert(index, item);
+		
 		public bool Remove(object item)
-		{
-			return _inner.Remove(item);
-		}
+			=>_inner.Remove(item);
+		
 
 		public void RemoveAt(int index)
-		{
-			_inner.RemoveAt(index);
-		}
+			=>_inner.RemoveAt(index);
+		
 
 		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return _inner.GetEnumerator();
-		}
+			=>_inner.GetEnumerator();
+		
 		public T[] ToArray<T>()
-		{
-			return ToArray<T>(this);
-		}
+			=>ToArray<T>(this);
+		
 		public T[] ToArray<T>(Func<object, T> createItem)
-		{
-			return ToArray(this,createItem);
-		}
+			=>ToArray(this,createItem);
+		
+		public KeyValuePair<TKey, TValue>[] ToArray<TKey, TValue>(string keyField, string valueField)
+			=> ToArray<TKey, TValue>(keyField, valueField);
 		public static T[] ToArray<T>(IList<object> list, Func<object, T> createItem)
 		{
 			if (null != list)
@@ -102,14 +90,29 @@ namespace Json
 			}
 			return null;
 		}
+		
 		public static T[] ToArray<T>(IList<object> list)
 		{
+			if (null == list)
+				return null;
 			var result = new T[list.Count];
 			for (var i = 0; i < result.Length; ++i)
 				result[i] = (T)list[i];
 			return result;
 		}
-
+		public static KeyValuePair<TKey, TValue>[] ToArray<TKey,TValue>(IList<object> list, string keyField,string valueField)
+		{
+			if (null == list)
+				return null;
+			var result = new KeyValuePair<TKey, TValue>[list.Count];
+			for(var i = 0;i<result.Length;++i)
+			{
+				var d = (IDictionary<string, object>)list[i];
+				if (null != d)
+					result[i] = new KeyValuePair<TKey, TValue>((TKey)d[keyField], (TValue)d[valueField]);
+			}
+			return result;
+		}
 		public static JsonArray Adapt(IList<object> list)
 		{
 			if (null == list) return null;
