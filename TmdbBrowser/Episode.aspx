@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Season.aspx.cs" Inherits="TmdbBrowser.Season" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Episode.aspx.cs" Inherits="TmdbBrowser.Episode" %>
 <%@ assembly name="System.Core" %>
 <%@ import namespace="System.Text" %>
 <%@ import namespace="System.Collections.Generic" %>
@@ -168,6 +168,7 @@ body {
   -o-background-size: cover;
   background-size: cover;
 }
+	 <%}%>
 	 div.gallery {
   margin: 5px;
   border: 1px solid #ccc;
@@ -193,7 +194,7 @@ div.desc {
   padding: 15px;
   text-align: center;
 }
-<%}%>
+
     </style>
 	
 </head>
@@ -209,7 +210,10 @@ div.desc {
 			</form>
         </div>
 		<div style="width:100%;text-align:center;background-color: rgba(7,7,26,.6);">
-			<div style="display:inline-block;">Runtime is <%=Math.Round(ApproxRunTime.TotalHours)%> hours</div>
+			<% 
+				var runtime = (int)Math.Round(ApproxRunTime.TotalHours);
+				%>
+			<div style="display:inline-block;">Runtime is <%=runtime%> hour<%=1 != runtime ? "s" : ""%>s</div>
 			<div style="float:right; font-family:Gruppo"><%
 						if(0<show.VoteCount) { %>
 						<div class="w3-grey w3-round-xlarge" style="width:200px;">
@@ -267,3 +271,4 @@ div.desc {
 	
 </body>
 </html>
+
