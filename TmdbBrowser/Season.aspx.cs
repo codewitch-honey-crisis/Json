@@ -47,7 +47,7 @@ namespace TmdbBrowser
 		}
 		protected TimeSpan ApproxRunTime {
 			get {
-				return new TimeSpan(0, (int)(show.EpisodeRunTime.TotalMinutes * show.TotalEpisodes), 0);
+				return new TimeSpan(0, (int)(show.EpisodeRunTime.TotalMinutes * season.Episodes.Length), 0);
 			}
 		}
 	}

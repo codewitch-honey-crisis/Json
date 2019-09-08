@@ -99,6 +99,7 @@ namespace TmdbApi
 		}
 		// TODO: figure out what this means and make an enum possibly
 		public string ProductionCode => GetCachedField<string>("production_code");
+		public string Overview => GetCachedField<string>("overview");
 		public string StillPath => GetCachedField<string>("still_path");
 		// TODO: refactor this. It's a duplicate from TmdbMedia and TmdbPerson, and TmdbSeason
 		public KeyValuePair<string, TmdbChangeAction[]>[] GetChangesGroupedByKey(int minPage, int maxPage, DateTime startDate = default(DateTime), DateTime endDate = default(DateTime))
@@ -255,6 +256,9 @@ namespace TmdbApi
 				return null;
 			}
 		}
+		public double VoteAverage => GetCachedField("vote_average", 0d);
+		public int VoteCount => GetCachedField("vote_count", 0);
+
 		public void Rate(double rating, TmdbSession session = null)
 		{
 			if (0.5d > rating || 10d < rating)

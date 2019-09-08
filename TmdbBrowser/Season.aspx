@@ -111,7 +111,7 @@
  text-decoration: none;
 }
 .searchresult:hover {
- background: #17152a;
+ background: rgba(7,7,26,.6);
 }
 
 .blink {
@@ -197,7 +197,7 @@ div.desc {
     </style>
 	
 </head>
-<body>
+<body >
     <header>
         <span>
             <a href="Default.aspx">media</a><a href="SearchShows.aspx">\tv</a><a href="Show.aspx?show=<%=show.Id%>">\<%=show.Name%></a><a href="#">\<%=season.Name%></a>
@@ -208,8 +208,8 @@ div.desc {
 				<button class="searchbutton" type="submit"><i class="fa fa-search"></i></button>
 			</form>
         </div>
-		<div style="width:100%;text-align:center;">
-			<div style="display:inline-block;">Runtime is <%=ApproxRunTime.TotalHours%> hours</div>
+		<div style="width:100%;text-align:center;background-color: rgba(7,7,26,.6);">
+			<div style="display:inline-block;">Runtime is <%=Math.Round(ApproxRunTime.TotalHours)%> hours</div>
 			<div style="float:right; font-family:Gruppo"><%
 						if(0<show.VoteCount) { %>
 						<div class="w3-grey w3-round-xlarge" style="width:200px;">
@@ -227,23 +227,43 @@ div.desc {
 	
     </header>
     <main style="width:100%">
-		<section class="header">
-            <div class="btext">
-				<span class="hanging-indent textstroke"><%=show.Overview%></span>
-            </div>
+		 <section class="heading">
+		<span>Episodes</span>
 		</section>
-		<section>
-			<%foreach (var episode in season.Episodes){%>
-			<div class="gallery">
-  <a href="Episode.aspx?show=<%=show.Id%>&season=<%=season.Number%>&episode=<%=episode.Number%>">
-    <div class="gallery_img" style="background-size:contain; background-position-x:center; background-repeat:no-repeat; background-image:url('<%=TmdbApi.Tmdb.GetImageUrl(Denull(episode.StillPath,"/"))%>');"></div>
-	</a>
- <div class="desc darkbgtext"><%=episode.Name%><br /><%=episode.AirDate.ToLongDateString()%></div>
-</div>
+		<div id="searchResults" style="margin-left: .2em; margin-right: .2em;padding-left: .6em;background-color: rgba(7,7,26,.6);">
+<%
+			var episodes = season.Episodes;
+			if (null!=episodes)
+				foreach(var episode in episodes) {%>	
+			<a href="Episode.aspx?show=<%=show.Id%>&season=<%=season.Number%>&episode=<%=episode.Number%>" class="resultlink">
+			<div class="clearfix searchresult" style="margin-bottom: .5em;">
+				<div>
+					<span style="font-family: Abel;"><%=episode.Name%></span>
+					<div style="float:right;"><%
+						if(0<episode.VoteCount) { %>
+						<div class="w3-grey w3-round-xlarge" style="width:200px;">
+							<div class="w3-container w3-round-xlarge w3-white" style="width:<%=(int)(episode.VoteAverage*10)%>%"><%=episode.VoteAverage%>/10&nbsp;(<%=episode.VoteCount%>&nbsp;vote<%=1!=episode.VoteCount?"s":""%>)</div>
+						</div>
+						<% } else {%>
+						<div class="w3-grey w3-round-xlarge" style="width:200px;">
+							<div class="w3-container">(unrated)</div>
+						</div>
+						
+						<%}%>
+					</div>
+				
+				</div>
+				<%if(null!=episode.StillPath) {%>
+				<img class="poster" src="<%=Tmdb.GetImageUrl(Denull(episode.StillPath,"/#"))%>" width="150" />
+				<%}%>
+				<div class="hanging-indent">
+					<p><%=episode.Overview%></p>
+				</div>
+			</div>
+			</a>
 			<%}%>
-			
-		</section>
-    </main>    
+		</div>
+    </main>
 	
 </body>
 </html>
