@@ -402,13 +402,15 @@ namespace Json
 			{
 				case -1:
 					if (Read())
-						return SkipToField(key);
+						return SkipToField(okey);
 					return false;
 				case 4:
 					while (Read() && 1 == _state) // first read will move to the child field of the root
 					{
 						rv = _pc.GetCapture();
-						if (key != rv && okey != rv)
+						if ("\"production_companies\"" == rv)
+							System.Diagnostics.Debugger.Break();
+						if (key != rv )
 							SkipSubtree(); // if this field isn't the target so just skip over the rest of it
 						else
 							break;
@@ -502,7 +504,9 @@ namespace Json
 		{
 			_pc.Expecting('\"');
 			_pc.Advance();
-			_pc.TrySkipUntil('\"',  true);
+			_pc.TrySkipUntil('\"', false);
+			_pc.Expecting('\"');
+			_pc.Advance();
 		}
 
 	}
