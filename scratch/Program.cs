@@ -14,6 +14,38 @@ namespace scratch
 		const string ApiKey = "c83a68923b7fe1d18733e8776bba59bb";
 		static void Main()
 		{
+			using (var reader = JsonTextReader.CreateFrom(@"..\..\data.json"))
+			{
+				if (reader.SkipTo("created_by", 0, "name"))
+				{
+					// move past the field name "name"
+					if (reader.Read())
+					{
+						Console.WriteLine(reader.Value);
+					}
+				}
+			}
+			// or...
+			using (var reader = JsonTextReader.CreateFrom(@"..\..\data.json"))
+			{
+
+				if (reader.SkipToField("created_by"))
+				{
+					if (reader.SkipToIndex(0))
+					{
+						reader.Read();
+						if (reader.SkipToField("name"))
+						{
+							if (reader.Read())
+							{
+								Console.WriteLine(reader.Value);
+							}
+						}
+					}
+				}
+			}
+			
+			return;
 			Tmdb.ApiKey = ApiKey;
 			Tmdb.CacheLevel = JsonRpcCacheLevel.Aggressive;
 			

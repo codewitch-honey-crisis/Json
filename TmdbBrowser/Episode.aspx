@@ -211,13 +211,13 @@ div.desc {
         </div>
 		<div style="width:100%;text-align:center;background-color: rgba(7,7,26,.6);">
 			<% 
-				var runtime = (int)Math.Round(ApproxRunTime.TotalHours);
+				var runtime = (int)Math.Round(ApproxRunTime.TotalMinutes);
 				%>
-			<div style="display:inline-block;">Runtime is <%=runtime%> hour<%=1 != runtime ? "s" : ""%>s</div>
+			<div style="display:inline-block;">Runtime is <%=runtime%> minute<%=1 != runtime ? "s" : ""%></div>
 			<div style="float:right; font-family:Gruppo"><%
 						if(0<show.VoteCount) { %>
 						<div class="w3-grey w3-round-xlarge" style="width:200px;">
-							<div class="w3-container w3-round-xlarge w3-white" style=" width:<%=(int)(show.VoteAverage*10)%>%"><%=show.VoteAverage%>/10&nbsp;(<%=show.VoteCount%>&nbsp;vote<%=1!=show.VoteCount?"s":""%>)</div>
+							<div class="w3-container w3-round-xlarge w3-white" style=" width:<%=(int)(episode.VoteAverage*10)%>%"><%=episode.VoteAverage%>/10&nbsp;(<%=episode.VoteCount%>&nbsp;vote<%=1!=episode.VoteCount?"s":""%>)</div>
 						</div>
 						<% } else {%>
 						<div class="w3-grey w3-round-xlarge" style="width:200px;">
@@ -232,40 +232,24 @@ div.desc {
     </header>
     <main style="width:100%">
 		 <section class="heading">
-		<span>Episodes</span>
+		<span><%=episode.AirDate.ToLongDateString()%></span>
 		</section>
 		<div id="searchResults" style="margin-left: .2em; margin-right: .2em;padding-left: .6em;background-color: rgba(7,7,26,.6);">
-<%
-			var episodes = season.Episodes;
-			if (null!=episodes)
-				foreach(var episode in episodes) {%>	
-			<a href="Episode.aspx?show=<%=show.Id%>&season=<%=season.Number%>&episode=<%=episode.Number%>" class="resultlink">
+			<a href="#" class="resultlink">
 			<div class="clearfix searchresult" style="margin-bottom: .5em;">
 				<div>
 					<span style="font-family: Abel;"><%=episode.Name%></span>
-					<div style="float:right;"><%
-						if(0<episode.VoteCount) { %>
-						<div class="w3-grey w3-round-xlarge" style="width:200px;">
-							<div class="w3-container w3-round-xlarge w3-white" style="width:<%=(int)(episode.VoteAverage*10)%>%"><%=Math.Round(episode.VoteAverage*10)/10%>/10&nbsp;(<%=episode.VoteCount%>&nbsp;vote<%=1!=episode.VoteCount?"s":""%>)</div>
-						</div>
-						<% } else {%>
-						<div class="w3-grey w3-round-xlarge" style="width:200px;">
-							<div class="w3-container">(unrated)</div>
-						</div>
-						<%}%>
-						<div><%=episode.AirDate.ToLongDateString()%></div>
-					</div>
-				
+					
 				</div>
 				<%if(null!=episode.StillPath) {%>
 				<img class="poster" src="<%=Tmdb.GetImageUrl(Denull(episode.StillPath,"/#"))%>" width="150" />
 				<%}%>
 				<div class="hanging-indent">
 					<p><%=episode.Overview%></p><br />
+					
 				</div>
 			</div>
 			</a>
-			<%}%>
 		</div>
     </main>
 	

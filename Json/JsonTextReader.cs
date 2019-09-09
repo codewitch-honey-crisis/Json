@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
-using System.Text;
 
 namespace Json
 {
-	using JsonField = KeyValuePair<string, object>;
-	
+
 	public enum JsonNodeType
 	{
 		EndDocument = -2,
@@ -321,6 +317,61 @@ namespace Json
 			}
 		}
 		/// <summary>
+		/// Skips to the specified index of the array. Must be positioned on a key or the start of an array.
+		/// </summary>
+		/// <param name="index">The index to skip to</param>
+		/// <returns>True if on the value element of the array. Otherwise, false</returns>
+		/// <remarks>Must be positioned on the start of a document, the key, or an array start. Otherwise this returns false.</remarks>
+		public bool SkipToIndex(int index)
+		{
+			if (-1==_state || 1 == _state) // initial or key
+				if (!Read())
+					return false;
+			if (2==_state) // array start
+			{
+				if (0 == index)
+					if (!Read())
+						return false;
+					else
+					{
+						for (var i = 0; i < index; ++i)
+						{
+							if (Read())
+								return false;
+							if (3 == _state) // end array
+								return false;
+							if (!SkipSubtree())
+								return false;
+						}
+					}
+				return true;
+			}
+			return false;
+		}
+		public bool SkipTo(params object[] indicesOrKeys)
+		{
+			if (-1 == _state)
+				if (!Read())
+					return false;
+			for(var i = 0;i<indicesOrKeys.Length;i++)
+			{
+				var field = indicesOrKeys[i] as string;
+				if (null != field)
+				{
+					if (!SkipToField(field))
+						return false;
+				}
+				else if (indicesOrKeys[i] is int)
+				{
+					if (!SkipToIndex((int)indicesOrKeys[i]))
+						return false;
+				}
+				else
+					throw new ArgumentException("There was not a string or an int at index " + i.ToString(), nameof(indicesOrKeys));
+			}
+			return true;
+		}
+		/// <summary>
 		/// Skips to the field with the specified name. Does not traverse descendants.
 		/// </summary>
 		/// <param name="key">The name of the field.</param>
@@ -336,7 +387,7 @@ namespace Json
 			{
 				while (Read())
 				{
-					if (1 == _state)
+					if (1 == _state) // key
 					{
 						rv = _pc.GetCapture();
 						if (key == rv)
@@ -349,7 +400,7 @@ namespace Json
 			{
 				case -1:
 					if (Read())
-						return SkipToField(okey);
+						return SkipToField(key);
 					return false;
 				case 4:
 					while (Read() && 1 == _state) // first read will move to the child field of the root
@@ -396,7 +447,6 @@ namespace Json
 						_pc.Advance();
 						_pc.Expecting();
 						break;
-					case '\'':
 					case '\"':
 						_SkipString();
 						break;
@@ -428,7 +478,6 @@ namespace Json
 						_pc.Advance();
 						_pc.Expecting();
 						break;
-					case '\'':
 					case '\"':
 						_SkipString();
 						break;
@@ -451,7 +500,7 @@ namespace Json
 		{
 			_pc.Expecting('\"');
 			_pc.Advance();
-			_pc.TrySkipUntil('\"', '\\', true);
+			_pc.TrySkipUntil('\"',  true);
 		}
 
 	}
