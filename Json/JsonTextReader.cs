@@ -408,7 +408,7 @@ namespace Json
 					while (Read() && 1 == _state) // first read will move to the child field of the root
 					{
 						rv = _pc.GetCapture();
-						if ("\"production_companies\"" == rv)
+						if ("\"seasons\"" == rv)
 							System.Diagnostics.Debugger.Break();
 						if (key != rv )
 							SkipSubtree(); // if this field isn't the target so just skip over the rest of it
@@ -446,6 +446,10 @@ namespace Json
 			{
 				switch (_pc.Current)
 				{
+					case '[':
+						_SkipArrayPart();
+						break;
+						
 					case '{':
 						++depth;
 						_pc.Advance();
@@ -477,6 +481,9 @@ namespace Json
 			{
 				switch (_pc.Current)
 				{
+					case '{':
+						_SkipObjectPart();
+						break;
 					case '[':
 						++depth;
 						_pc.Advance();

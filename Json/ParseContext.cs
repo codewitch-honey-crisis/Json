@@ -97,6 +97,7 @@ namespace Json
 			}
 			return false;
 		}
+
 		public bool TryReadUntil(int character, int escapeChar, bool readCharacter = true)
 		{
 			EnsureStarted();
@@ -160,6 +161,7 @@ namespace Json
 			}
 			return false;
 		}
+	
 		private static bool _ContainsChar(char[] chars, char ch)
 		{
 			foreach (char cmp in chars)

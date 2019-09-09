@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Json
@@ -120,6 +121,13 @@ namespace Json
 			if (null == result)
 				result = new JsonArray(list,false);
 			return result;
+		}
+		public override string ToString()
+		{
+			var sw = new StringWriter();
+			JsonObject.WriteTo(this,sw, "   ");
+			sw.Flush();
+			return sw.ToString();
 		}
 	}
 }
