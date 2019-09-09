@@ -330,6 +330,7 @@ namespace Json
 			if (2==_state) // array start
 			{
 				if (0 == index)
+				{
 					if (!Read())
 						return false;
 					else
@@ -344,6 +345,7 @@ namespace Json
 								return false;
 						}
 					}
+				}
 				return true;
 			}
 			return false;

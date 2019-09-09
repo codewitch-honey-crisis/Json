@@ -16,12 +16,12 @@ namespace scratch
 		{
 			using (var reader = JsonTextReader.CreateFrom(@"..\..\data.json"))
 			{
-				if (reader.SkipTo("created_by", 0, "name"))
+				if (reader.SkipTo("production_companies", 0))
 				{
 					// move past the field name "name"
-					if (reader.Read())
+					if (JsonNodeType.Key!=reader.NodeType || reader.Read())
 					{
-						Console.WriteLine(reader.Value);
+						Console.WriteLine(reader.ParseSubtree());
 					}
 				}
 			}
