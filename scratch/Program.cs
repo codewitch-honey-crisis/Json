@@ -16,7 +16,7 @@ namespace scratch
 		{
 			using (var reader = JsonTextReader.CreateFrom(@"..\..\data.json"))
 			{
-				if (reader.SkipTo("seasons",0,"name"))
+				if (reader.SkipTo("seasons",7))
 				{
 					// move past the field name "name"
 					if (JsonNodeType.Key!=reader.NodeType || reader.Read())

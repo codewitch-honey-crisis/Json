@@ -333,18 +333,20 @@ namespace Json
 				{
 					if (!Read())
 						return false;
-					else
+				}
+				else
+				{
+					for (var i = 0; i < index; ++i)
 					{
-						for (var i = 0; i < index; ++i)
-						{
-							if (Read())
-								return false;
-							if (3 == _state) // end array
-								return false;
-							if (!SkipSubtree())
-								return false;
-						}
+						if (3 == _state) // end array
+							return false;
+						if (!Read())
+							return false;
+						if (!SkipSubtree())
+							return false;
 					}
+					if ((5==_state || 3==_state) && !Read())
+						return false;
 				}
 				return true;
 			}
@@ -408,8 +410,6 @@ namespace Json
 					while (Read() && 1 == _state) // first read will move to the child field of the root
 					{
 						rv = _pc.GetCapture();
-						if ("\"seasons\"" == rv)
-							System.Diagnostics.Debugger.Break();
 						if (key != rv )
 							SkipSubtree(); // if this field isn't the target so just skip over the rest of it
 						else
