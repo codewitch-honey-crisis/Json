@@ -14,11 +14,74 @@ namespace scratch
 		const string ApiKey = "c83a68923b7fe1d18733e8776bba59bb";
 		static void Main()
 		{
+			var url = "http://api.themoviedb.org/3/tv/2129?api_key=c83a68923b7fe1d18733e8776bba59bb";
+			using (var reader = JsonTextReader.CreateFromUrl(url))
+			{
+				// skip to "$.created_by[1].name" <-- JSON path syntax
+				if (reader.SkipTo("created_by", 0, "name"))
+				{
+					// we're currently on the *key*/field name
+					// we have to move to the value if we want 
+					// just that.
+					if (reader.Read())
+						Console.WriteLine(reader.ParseSubtree());
+					else // below should never execute
+						Console.WriteLine("Sanity check failed, key has no value");
+					// we need to move outward in the tree 
+					// so we can read the next array element
+					// so we skip the rest of this object
+					reader.SkipToEndObject();
+					if (reader.Read()) // read past the end of the object
+					{
+						reader.SkipToField("name");
+						// we're currently on the *key*/field name
+						if (reader.Read())
+							Console.WriteLine(reader.ParseSubtree());
+						else // below should never execute
+							Console.WriteLine("Sanity check failed, key has no value");
+					}
+					else // below should never execute, we didn't expect to reach the end
+						Console.WriteLine("Sanity check failed, unexpected end of document");
+					
+				}
+				else
+					Console.WriteLine("Not found");
+			}
+			return;
+			using (var reader=JsonTextReader.CreateFromUrl("http://api.themoviedb.org/3/tv/2129?api_key=c83a68923b7fe1d18733e8776bba59bb"))
+			{
+				// skip to "$.created_by[1].name" <-- JSON path syntax
+				if (reader.SkipTo("created_by", 1, "name"))
+				{
+					// we're currently on the *key*/field name
+					// we have to move to the value if we want 
+					// just that.
+					if (reader.Read())
+						Console.WriteLine(reader.ParseSubtree());
+					else // below should never execute
+						Console.WriteLine("Sanity check failed, key has no value");
+				}
+				else
+					Console.WriteLine("Not found");
+			}
+			return;
 			using (var reader = JsonTextReader.CreateFrom(@"..\..\data.json"))
 			{
-				if (reader.SkipTo("seasons",7))
+				while(reader.Read())
 				{
-					// move past the field name "name"
+					Console.Write(reader.NodeType);
+					if (JsonNodeType.Value == reader.NodeType 
+						|| JsonNodeType.Key==reader.NodeType)
+						Console.Write(" " + reader.Value);
+					Console.WriteLine();
+				}
+			}
+			return;
+			using (var reader = JsonTextReader.CreateFrom(@"..\..\data.json"))
+			{
+				if (reader.SkipTo("seasons",7,"episodes",3,"guest_stars",0,"character"))
+				{
+					// move past the field name if it's a key.
 					if (JsonNodeType.Key!=reader.NodeType || reader.Read())
 					{
 						Console.WriteLine(reader.ParseSubtree());

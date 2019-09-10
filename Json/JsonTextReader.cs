@@ -193,7 +193,9 @@ namespace Json
 		}
 		public string RawValue {
 			get {
-				return _pc.GetCapture();
+				if(0==_state || 1==_state) // key or value
+					return _pc.GetCapture();
+				return null;
 			}
 		}
 		public object Value {
@@ -383,9 +385,7 @@ namespace Json
 		/// <remarks>This will return false unless called from an object start or from a field.</remarks>
 		public bool SkipToField(string key, bool searchDescendants = false)
 		{
-			string okey = key;
-			key = JsonObject.DecorateString(okey);
-			string rv;
+			string val;
 
 			if (searchDescendants)
 			{
@@ -393,8 +393,8 @@ namespace Json
 				{
 					if (1 == _state) // key
 					{
-						rv = _pc.GetCapture();
-						if (key == rv)
+						val = JsonObject.UndecorateString(_pc.GetCapture());
+						if (key == val)
 							return true;
 					}
 				}
@@ -404,29 +404,29 @@ namespace Json
 			{
 				case -1:
 					if (Read())
-						return SkipToField(okey);
+						return SkipToField(key);
 					return false;
 				case 4:
 					while (Read() && 1 == _state) // first read will move to the child field of the root
 					{
-						rv = _pc.GetCapture();
-						if (key != rv )
+						val = JsonObject.UndecorateString(_pc.GetCapture());
+						if (key != val )
 							SkipSubtree(); // if this field isn't the target so just skip over the rest of it
 						else
 							break;
 					}
 					return 1 == _state;
 				case 1: // we're already on a field
-					rv = _pc.GetCapture();
-					if (key == rv || okey == rv)
+					val = JsonObject.UndecorateString(_pc.GetCapture());
+					if (key == val)
 						return true;
 					else if (!SkipSubtree())
 						return false;
 
 					while (Read() && 1 == _state) // first read will move to the child field of the root
 					{
-						rv = _pc.GetCapture();
-						if (key != rv && okey != rv)
+						val = JsonObject.UndecorateString(_pc.GetCapture());
+						if (key != val)
 							SkipSubtree(); // if this field isn't the target just skip over the rest of it
 						else
 							break;
@@ -435,9 +435,79 @@ namespace Json
 				default:
 					return false;
 			}
-
 		}
+		public bool SkipToAnyOfFields(params string[] anyOfKeys)
+			=> SkipToAnyOfFields(anyOfKeys, false);
+		// code is duplicated for optimizations reasons.
+		/// <summary>
+		/// Searches for one of the fields in the keys
+		/// </summary>
+		/// <param name="searchDescendants">True to look through the entire subtree, otherwise, false</param>
+		/// <param name="anyOfKeys">The keys to look for</param>
+		/// <returns></returns>
+		public bool SkipToAnyOfFields(string[] anyOfKeys,bool searchDescendants)
+		{
+			string val;
 
+			if (searchDescendants)
+			{
+				while (Read())
+				{
+					if (1 == _state) // key
+					{
+						val = JsonObject.UndecorateString(_pc.GetCapture());
+						if (-1<Array.IndexOf(anyOfKeys,val))
+							return true;
+					}
+				}
+				return false;
+			}
+			switch (_state)
+			{
+				case -1:
+					if (Read())
+						return SkipToAnyOfFields(anyOfKeys);
+					return false;
+				case 4:
+					while (Read() && 1 == _state) // first read will move to the child field of the root
+					{
+						val = JsonObject.UndecorateString(_pc.GetCapture());
+						if (0 > Array.IndexOf(anyOfKeys, val))
+							SkipSubtree(); // if this field isn't the target so just skip over the rest of it
+						else
+							break;
+					}
+					return 1 == _state;
+				case 1: // we're already on a field
+					val = JsonObject.UndecorateString(_pc.GetCapture());
+					if (-1<Array.IndexOf(anyOfKeys,val))
+						return true;
+					else if (!SkipSubtree())
+						return false;
+
+					while (Read() && 1 == _state) // first read will move to the child field of the root
+					{
+						val = JsonObject.UndecorateString(_pc.GetCapture());
+						if (0>Array.IndexOf(anyOfKeys,val))
+							SkipSubtree(); // if this field isn't the target just skip over the rest of it
+						else
+							break;
+					}
+					return 1 == _state;
+				default:
+					return false;
+			}
+		}
+		public void SkipToEndObject()
+		{
+			_SkipObjectPart();
+			_state = 5; // end object
+		}
+		public void SkipToEndArray()
+		{
+			_SkipArrayPart();
+			_state = 3; // end array
+		}
 		// optimization
 		private void _SkipObjectPart()
 		{
