@@ -5,13 +5,16 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using Json;
+using Bee;
 namespace TmdbApi
 {
 	public static partial class Tmdb
 	{
 		const string _apiUrlBase = "https://api.themoviedb.org/3";
-		static ThreadLocal<IDictionary<string, object>> _json=new ThreadLocal<IDictionary<string, object>>(()=>new JsonObject());
-		public static IDictionary<string,object> Json { get { return _json.Value; } }
+		//static ThreadLocal<IDictionary<string, object>> _json=new ThreadLocal<IDictionary<string, object>>(()=>new JsonObject());
+		//public static IDictionary<string,object> Json { get { return _json.Value; } }
+		internal static ReaderWriterLockSlim Lock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		public static IDictionary<string, object> Json { get; } = new Dictionary<string, object>().Synchronize(Lock);
 		public static string ApiKey { get; set; }
 		public static string Language { get; set; }
 		// by my tests this wait is just about right
@@ -75,7 +78,18 @@ namespace TmdbApi
 				{
 					var s = JsonRpc.GetInvocationUrl(url, args);
 					System.Diagnostics.Debug.WriteLine("Requesting from " + s);
-					result = JsonRpc.Invoke(s, null/*we already computed the url*/, payload, null, httpMethod, fixupResult, fixupError, Tmdb.CacheLevel);
+					result = JsonRpc.Invoke(
+						s, 
+						null/*we already computed the url*/, 
+						payload, 
+						null, 
+						httpMethod, 
+						fixupResult, 
+						fixupError, 
+						Tmdb.CacheLevel,
+						()=>new JsonObject().Synchronize(),
+						()=>new JsonArray().Synchronize() as IList<object>
+						);
 					if (null == result)
 						break;
 				}
@@ -169,7 +183,7 @@ namespace TmdbApi
 		// some page routines are not in the paged format
 		static IDictionary<string, object> _InvokeFlatPaged(string path, bool sendLang, int minPage, int maxPage, IDictionary<string, object> args, Func<object, object> fixupResultItem, Func<object, object> fixupError)
 		{
-			var result = new JsonObject();
+			var result = new JsonObject().Synchronize();
 			var hasResults = false;
 			if (0 > minPage)
 				throw new ArgumentOutOfRangeException(nameof(minPage));
@@ -223,7 +237,7 @@ namespace TmdbApi
 				return null;
 			var list = new List<KeyValuePair<string, object>>(paged);
 			list.Sort((x, y) => x.Key.CompareTo(y.Key));
-			var result = new JsonArray();
+			var result = new JsonArray().Synchronize() as IList<object>;
 			for (int ic = list.Count, i = 0; i < ic; ++i)
 			{
 				var l = list[i].Value as IList<object>;

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Bee;
 namespace TmdbApi
 {
 	public sealed class TmdbSession : TmdbEntity, IDisposable
@@ -12,7 +12,7 @@ namespace TmdbApi
 		{	
 		}
 		static IDictionary<string,object> _CreateJson(string id) {
-			var result = new JsonObject();
+			var result = new JsonObject().Synchronize();
 			result.Add("id", id);
 			return result;
 		}
@@ -44,7 +44,7 @@ namespace TmdbApi
 					if (!string.IsNullOrEmpty(id))
 					{
 						// create the object to initialize the movie list with
-						var j = new JsonObject();
+						var j = new JsonObject().Synchronize();
 						j.Add("id", id);
 						return new TmdbMovieList(j);
 					}

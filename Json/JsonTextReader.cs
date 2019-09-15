@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace Json
 {
@@ -175,6 +176,7 @@ namespace Json
 		{
 			_pc.Close();
 		}
+		
 		public static JsonTextReader Create(string jsonText)
 		{
 			return new JsonTextReader(ParseContext.Create(jsonText));
@@ -229,7 +231,7 @@ namespace Json
 				}
 			}
 		}
-		public object ParseSubtree()
+		public object ParseSubtree(Func<IDictionary<string,object>> objectCreator=null,Func<IList<object>> arrayCreator=null)
 		{
 			IList<object> l = null;
 			IDictionary<string, object> d = null;
@@ -242,7 +244,7 @@ namespace Json
 				case -1:
 					if (!Read())
 						_pc.Expecting();
-					return ParseSubtree();
+					return ParseSubtree(objectCreator,arrayCreator);
 				case 0:
 					result = Value;
 					break;
@@ -250,13 +252,16 @@ namespace Json
 					rv = Value as string;
 					if (!Read())
 						_pc.Expecting();
-					result = new KeyValuePair<string, object>(rv, ParseSubtree());
+					result = new KeyValuePair<string, object>(rv, ParseSubtree(objectCreator,arrayCreator));
 					break;
 				case 2:// begin array
-					l = new JsonArray();
+					if (null != arrayCreator)
+						l = arrayCreator();
+					else
+						l = new JsonArray();
 					while (Read() && 3 != _state)
 					{
-						l.Add(ParseSubtree());
+						l.Add(ParseSubtree(objectCreator,arrayCreator));
 					}
 					result = l;
 					break;
@@ -264,10 +269,13 @@ namespace Json
 					result = null;
 					break;
 				case 4:// begin object
-					d = new JsonObject();
+					if (null != objectCreator)
+						d = objectCreator();
+					else
+						d = new JsonObject();
 					while (Read() && 5 != _state) // not end object
 					{
-						KeyValuePair<string, object> kvp = (KeyValuePair<string, object>)ParseSubtree();
+						KeyValuePair<string, object> kvp = (KeyValuePair<string, object>)ParseSubtree(objectCreator,arrayCreator);
 						d.Add(kvp.Key, kvp.Value);
 					}
 					result = d;
@@ -354,6 +362,11 @@ namespace Json
 			}
 			return false;
 		}
+		/// <summary>
+		/// Skips through a series of indices and keys to wind you up at the specified path
+		/// </summary>
+		/// <param name="indicesOrKeys">The indices and keys to navigate</param>
+		/// <returns>True if found, and the reader is positioned on the key or index. False if not. Either way, the reader is advanced.</returns>
 		public bool SkipTo(params object[] indicesOrKeys)
 		{
 			if (-1 == _state)
@@ -436,6 +449,11 @@ namespace Json
 					return false;
 			}
 		}
+		/// <summary>
+		/// Skips to one of the fields in the list
+		/// </summary>
+		/// <param name="anyOfKeys">The list of fields to try.</param>
+		/// <returns>True if one of the fields matched, and the reader ends up positioned on a key. Otherwise false.</returns>
 		public bool SkipToAnyOfFields(params string[] anyOfKeys)
 			=> SkipToAnyOfFields(anyOfKeys, false);
 		// code is duplicated for optimizations reasons.
@@ -444,7 +462,7 @@ namespace Json
 		/// </summary>
 		/// <param name="searchDescendants">True to look through the entire subtree, otherwise, false</param>
 		/// <param name="anyOfKeys">The keys to look for</param>
-		/// <returns></returns>
+		/// <returns>True if one of the fields matched, and the reader ends up positioned on a key. Otherwise false.</returns>
 		public bool SkipToAnyOfFields(string[] anyOfKeys,bool searchDescendants)
 		{
 			string val;

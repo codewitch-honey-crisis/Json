@@ -14,7 +14,7 @@ namespace Json
 	/// <remarks>
 	/// This is just a <see cref="System.Collections.Generic.IDictionary{string, object}"/> with a dynamic call sink that exposes the keys as properties, and some utility methods for manipulating JSON data. This class is not required. You can use another dictionary instead if need be.
 	/// </remarks>
-	public sealed class JsonObject : DynamicObject, IDictionary<string, object>, IEquatable<object>, ICloneable
+	public sealed class JsonObject : DynamicObject, IDictionary<string, object>, IEquatable<object>
 	{
 		IDictionary<string, object> _inner;
 
@@ -144,9 +144,9 @@ namespace Json
 				result = new JsonObject(dictionary, false);
 			return result;
 		}
-		public static JsonObject Parse(string text)
+		public static JsonObject Parse(string text,Func<IDictionary<string,object>> objectCreator=null,Func<IList<object>> arrayCreator=null)
 		{
-			return JsonTextReader.Create(text).ParseSubtree() as JsonObject;
+			return Adapt(JsonTextReader.Create(text).ParseSubtree(objectCreator, arrayCreator) as IDictionary<string,object>);
 		}
 		public static JsonObject ReadFrom(TextReader reader)
 		{
@@ -167,9 +167,10 @@ namespace Json
 			=> JsonPathContext.Default.Select(json, path);
 		public IEnumerable<object> Select(string path)
 			=> Select(this, path);
-
 		public static IDictionary<string, object> CreatePath(IDictionary<string, object> current, params string[] keys)
-			=> _CreatePath(current, keys, 0);
+			=> _CreatePath(current, keys,0,null);
+		public static IDictionary<string, object> CreatePath(IDictionary<string, object> current, Func<IDictionary<string, object>> objectCreator,params string[] keys)
+			=> _CreatePath(current, keys, 0,objectCreator);
 		public static object Get(object source, params object[] indicesAndKeys)
 		{
 			if (0 == indicesAndKeys.Length) return source;
@@ -233,16 +234,20 @@ namespace Json
 				return _Get(target, indicesAndKeys, index + 1);
 			return target;
 		}
-		static IDictionary<string, object> _CreatePath(IDictionary<string, object> current, string[] keys, int keyIndex)
+		static IDictionary<string, object> _CreatePath(IDictionary<string, object> current, string[] keys, int keyIndex,Func<IDictionary<string,object>> objectCreator)
 		{
 			var k = keys[keyIndex];
 			object o;
 			if (!current.TryGetValue(k, out o))
 			{
-				var jo = new JsonObject();
+				IDictionary<string, object> jo;
+				if (null != objectCreator)
+					jo = objectCreator();
+				else
+					jo = new JsonObject();
 				current.Add(k, jo);
 				if (keyIndex < keys.Length - 1)
-					return _CreatePath(jo, keys, keyIndex + 1);
+					return _CreatePath(jo, keys, keyIndex + 1,objectCreator);
 			}
 			else
 			{
@@ -250,7 +255,7 @@ namespace Json
 				if (null == d)
 					throw new InvalidOperationException("The subtree already exists and is a different kind.");
 				if (keyIndex < keys.Length - 1)
-					return _CreatePath(d, keys, keyIndex + 1);
+					return _CreatePath(d, keys, keyIndex + 1,objectCreator);
 			}
 			return current[k] as IDictionary<string, object>;
 		}
@@ -707,14 +712,6 @@ namespace Json
 			result.Append("\"");
 			return result.ToString();
 		}
-		public JsonObject Clone()
-		{
-			var result = new JsonObject();
-			CopyTo(result);
-			return result;
-		}
 		
-		object ICloneable.Clone()
-			=> Clone();
 	}
 }

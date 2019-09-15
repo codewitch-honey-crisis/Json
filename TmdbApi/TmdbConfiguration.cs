@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Json;
+using Bee;
 namespace TmdbApi
 {
 	public sealed class TmdbConfiguration : TmdbCachedEntityWithId
@@ -11,7 +12,7 @@ namespace TmdbApi
 		{
 			InitializeCache();
 		}
-		public TmdbConfiguration() : base(new JsonObject())
+		public TmdbConfiguration() : base(new JsonObject().Synchronize())
 		{
 			InitializeCache();
 		}

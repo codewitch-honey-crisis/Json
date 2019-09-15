@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Bee;
 namespace TmdbApi
 {
 	public sealed class TmdbReview : TmdbCachedEntityWithId2
@@ -34,7 +34,7 @@ namespace TmdbApi
 					var mt = GetCachedField<string>("media_title");
 					if (-1 < mid)
 					{
-						var obj = new JsonObject();
+						var obj = new JsonObject().Synchronize();
 						obj["id"] = mid;
 						switch (m)
 						{

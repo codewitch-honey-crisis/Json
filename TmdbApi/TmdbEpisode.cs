@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Bee;
 namespace TmdbApi
 {
 	public sealed class TmdbEpisode : TmdbCachedEntity
@@ -14,7 +14,7 @@ namespace TmdbApi
 		}
 		static IDictionary<string, object> _CreateJson(int showId, int seasonNumber, int episodeNumber)
 		{
-			var result = new JsonObject();
+			var result = new JsonObject().Synchronize();
 			result.Add("show_id", showId);
 			result.Add("season_number", seasonNumber);
 			result.Add("episode_number", episodeNumber);

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Bee;
 namespace TmdbApi
 {
 	public abstract class TmdbCachedEntity : TmdbEntity
@@ -57,7 +57,7 @@ namespace TmdbApi
 			var path = PathIdentity;
 			if (null != path)
 			{
-				var json = JsonObject.CreatePath(Tmdb.Json, path);
+				var json = JsonObject.CreatePath(Tmdb.Json, () => new JsonObject().Synchronize() ,path);
 				JsonObject.CopyTo(Json, json);
 				Json = json;
 			}
@@ -77,7 +77,7 @@ namespace TmdbApi
 		
 		private static IDictionary<string,object> _CreateJsonFromId(int id)
 		{
-			var result = new JsonObject();
+			var result = new JsonObject().Synchronize();
 			result.Add("id", id);
 			return result;
 		}
@@ -97,7 +97,7 @@ namespace TmdbApi
 		}
 		private static IDictionary<string, object> _CreateJsonFromId(string id)
 		{
-			var result = new JsonObject();
+			var result = new JsonObject().Synchronize();
 			result.Add("id", id);
 			return result;
 		}

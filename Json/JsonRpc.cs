@@ -144,7 +144,9 @@ namespace Json
 			string httpMethod = null,
 			Func<object,object> fixupResponse=null, 
 			Func<object, object> fixupError=null,
-			JsonRpcCacheLevel cache=JsonRpcCacheLevel.Conservative)
+			JsonRpcCacheLevel cache=JsonRpcCacheLevel.Conservative,
+			Func<IDictionary<string,object>> objectCreator=null,
+			Func<IList<object>> arrayCreator = null)
 		{
 			HttpWebRequest wreq=null;
 			HttpWebResponse wrsp = null;
@@ -195,7 +197,7 @@ namespace Json
 						object data = null;
 						try
 						{
-							data = reader.ParseSubtree();
+							data = reader.ParseSubtree(objectCreator,arrayCreator);
 						}
 						catch (ExpectingException eex)
 						{
@@ -237,11 +239,15 @@ namespace Json
 							object data = null;
 							try
 							{
-								data = reader.ParseSubtree();
+								data = reader.ParseSubtree(objectCreator,arrayCreator);
 							}
 							catch(ExpectingException eex)
 							{
-								var jex= new JsonObject();
+								IDictionary<string, object> jex;
+								if (null != objectCreator)
+									jex = objectCreator();
+								else
+									jex = new JsonObject();
 
 								jex.Add("status_code", -39);
 								jex.Add("status_message", "Malformed or empty JSON data returned: " + eex.Message);

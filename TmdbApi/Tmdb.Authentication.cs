@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-
+using Bee;
 namespace TmdbApi
 {
 	partial class Tmdb
@@ -66,7 +66,7 @@ namespace TmdbApi
 		}
 		public static TmdbSession CreateSession(string requestToken)
 		{
-			var body = new JsonObject();
+			var body = new JsonObject().Synchronize();
 			body.Add("request_token", requestToken);
 			var d = Invoke("/authentication/session/new",body);
 			if (null != d)
@@ -89,7 +89,7 @@ namespace TmdbApi
 		}
 		public static KeyValuePair<string, DateTime> AuthenticateRequestToken(string requestToken, string username, string password)
 		{
-			var body = new JsonObject();
+			var body = new JsonObject().Synchronize();
 			body.Add("username", username);
 			body.Add("password", password);
 			body.Add("request_token", requestToken);

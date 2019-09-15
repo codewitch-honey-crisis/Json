@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Bee;
 namespace TmdbApi
 {
 	public sealed class TmdbShow : TmdbMedia
@@ -136,7 +136,7 @@ namespace TmdbApi
 			{
 				// fix up the season data.
 				object o;
-				var newSeasons = new JsonObject();
+				var newSeasons = new JsonObject().Synchronize();
 				if (d.TryGetValue("seasons", out o))
 				{
 					var l = o as IList<object>;

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Bee;
 namespace TmdbApi
 {
 	partial class Tmdb
@@ -18,7 +18,7 @@ namespace TmdbApi
 						object o;
 						if (pt.TryGetValue("certifications", out o))
 						{
-							var dd = new JsonObject();
+							var dd = new JsonObject().Synchronize();
 							Json.Add("movie_certifications", dd);
 							JsonObject.CopyTo(o, dd);
 							d = dd;
@@ -39,7 +39,7 @@ namespace TmdbApi
 						object o;
 						if (pt.TryGetValue("certifications", out o))
 						{
-							var dd = new JsonObject();
+							var dd = new JsonObject().Synchronize();
 							Json.Add("show_certifications", dd);
 							JsonObject.CopyTo(o, dd);
 							d = dd;
