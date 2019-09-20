@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Bee;
 namespace TmdbApi
 {
 	public sealed class TmdbNetwork : TmdbCachedEntityWithId
@@ -56,9 +56,9 @@ namespace TmdbApi
 			var l = GetField<IList<object>>("images");
 			if (null == l)
 			{
-				l = new JsonArray();
+				l = new JsonArray().Synchronize() as IList<object>;
 				var json = Tmdb.InvokeLang(string.Concat("/", string.Join("/", PathIdentity), "/images"));
-				var array = new JsonArray();
+				var array = new JsonArray().Synchronize() as IList<object>;
 				object o;
 				if (json.TryGetValue("logos", out o))
 				{

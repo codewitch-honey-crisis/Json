@@ -118,7 +118,7 @@ namespace TmdbApi
 		}
 		static IDictionary<string, object> _InvokePaged(string path, bool sendLang, int minPage, int maxPage, IDictionary<string, object> args, Func<object, object> fixupResultItem, Func<object, object> fixupError)
 		{
-			var result = new JsonObject();
+			var result = new JsonObject().Synchronize();
 			var hasResults = false;
 			if (0 > minPage)
 				throw new ArgumentOutOfRangeException(nameof(minPage));

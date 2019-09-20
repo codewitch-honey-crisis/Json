@@ -91,6 +91,26 @@ namespace Json
 			}
 			return null;
 		}
+		public static JsonArray FromArray(IEnumerable array)
+		{
+			var result = new JsonArray();
+			foreach(var obj in array)
+			{
+				if ((null == obj) ||
+					obj is bool ||
+					obj is string ||
+					obj is int ||
+					obj is double ||
+					obj is long ||
+					obj is System.Numerics.BigInteger)
+				{
+					result.Add(obj);
+				}
+				else
+					throw new NotSupportedException("The array contains one or more items of an unsupported type.");
+			}
+			return result;
+		}
 		
 		public static T[] ToArray<T>(IList<object> list)
 		{
